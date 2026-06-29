@@ -6,8 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="盤前規劃">
-<link rel="manifest" href="/pq-manifest.json">
-<link rel="apple-touch-icon" href="/pq-icon.svg">
+<link rel="manifest" href="pq-manifest.json">
+<link rel="apple-touch-icon" href="pq-icon.svg">
 <title>台指期盤前規劃</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1291,7 +1291,7 @@ prefillForm(curSess);
 </script>
 <script>
 if('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
 </script>
 </body>

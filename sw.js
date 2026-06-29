@@ -1,5 +1,5 @@
-const CACHE = 'pq-v1';
-const FILES = ['/', '/pq-manifest.json', '/pq-icon.svg'];
+const CACHE = 'pq-v2';
+const FILES = ['./盤前規劃.html', './pq-manifest.json', './pq-icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
@@ -17,6 +17,6 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/')))
+    fetch(e.request).catch(() => caches.match(e.request))
   );
 });

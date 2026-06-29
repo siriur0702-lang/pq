@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="盤前規劃">
+<link rel="manifest" href="/pq-manifest.json">
+<link rel="apple-touch-icon" href="/pq-icon.svg">
+<title>台指期盤前規劃</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f0f13;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh}
+.tab-bar{display:flex;background:#13131a;border-bottom:1px solid #222;position:sticky;top:0;z-index:100}
+.tab-btn{flex:1;padding:12px 2px;font-size:12px;color:#555;background:none;border:none;cursor:pointer;touch-action:manipulation;border-bottom:2px solid transparent}
+.tab-btn.active{color:#4fc3f7;border-bottom-color:#4fc3f7}
+.pane{display:none;padding:12px 12px 90px}
+.pane.active{display:block}
+.card{background:#1a1a24;border-radius:10px;padding:13px;margin-bottom:10px;border:1px solid #252532}
+h3{font-size:14px;font-weight:600;margin-bottom:10px}
+.sub{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin:8px 0 6px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px}
+.ig{display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:11px;color:#666}
+input,select{width:100%;background:#0f0f13;border:1px solid #252532;border-radius:6px;padding:9px 8px;color:#e0e0e0;font-size:14px;touch-action:manipulation;-webkit-appearance:none}
+input:focus,select:focus{outline:none;border-color:#4fc3f7}
+input.locked{background:#0a0a10;color:#555;border-color:#1a1a22}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath fill='%23555' d='M5 7L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px}
+.lock-tag{font-size:10px;color:#444;padding:1px 5px;background:#131318;border:1px solid #1e1e28;border-radius:3px;margin-top:2px;display:inline-block}
+.btn{display:block;width:100%;padding:13px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;margin-bottom:8px}
+.btn-blue{background:#4fc3f7;color:#000}
+.btn-green{background:#69f0ae;color:#000}
+.btn-gray{background:#1e1e2a;color:#aaa;border:1px solid #2a2a38}
+.sess-row{display:flex;gap:8px;margin-bottom:10px}
+.sess-btn{flex:1;padding:10px;border-radius:8px;border:1px solid #252532;background:#1a1a24;color:#555;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation}
+.sess-btn.active{border-color:#4fc3f7;color:#4fc3f7;background:rgba(79,195,247,.1)}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600}
+.b-突破多{background:rgba(255,82,82,.15);color:#ff5252;border:1px solid rgba(255,82,82,.4)}
+.b-維持多{background:rgba(255,152,0,.15);color:#ff9800;border:1px solid rgba(255,152,0,.4)}
+.b-維持空{background:rgba(105,240,174,.15);color:#69f0ae;border:1px solid rgba(105,240,174,.4)}
+.b-突破空{background:rgba(79,195,247,.15);color:#4fc3f7;border:1px solid rgba(79,195,247,.4)}
+.b-none{background:#1a1a24;color:#444;border:1px solid #252532}
+.dvd{height:1px;background:#1e1e28;margin:10px 0}
+.fetch-log{font-size:12px;margin:6px 0 4px;line-height:1.9;color:#666}
+.ok{color:#69f0ae}.err{color:#ff5252}.loading{color:#ffb74d}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid #333;border-top-color:#4fc3f7;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sec-act{font-size:12px;color:#4fc3f7;cursor:pointer;touch-action:manipulation}
+.hist-item{background:#1a1a24;border-radius:8px;padding:11px;margin-bottom:7px;border:1px solid #252532;cursor:pointer}
+.hist-det{display:none;margin-top:9px;padding-top:9px;border-top:1px solid #1e1e28}
+.hist-det.open{display:block}
+/* Sentiment */
+.sent-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.sent-item{background:#131318;border-radius:8px;padding:10px}
+.sent-lbl{font-size:11px;color:#555;margin-bottom:4px}
+.sent-val{font-size:20px;font-weight:700}
+.sent-sub{font-size:11px;color:#666;margin-top:2px}
+.contra-dots{display:flex;gap:7px;align-items:center;margin-top:8px}
+.dot{width:13px;height:13px;border-radius:50%;background:#1e1e28}
+.dot.on{background:#ff9800}
+.signal-box{padding:11px 13px;border-radius:8px;font-size:13px;line-height:1.7;margin-bottom:10px}
+.sig-bull{background:rgba(255,82,82,.1);border-left:3px solid #ff5252}
+.sig-bear{background:rgba(79,195,247,.1);border-left:3px solid #4fc3f7}
+.sig-warn{background:rgba(255,152,0,.12);border-left:3px solid #ff9800}
+.sig-neu{background:#1a1a24;border-left:3px solid #333}
+/* Price table */
+.ptbl{width:100%;border-collapse:collapse;font-size:13px}
+.ptbl th{color:#444;font-weight:normal;padding:4px 6px;text-align:right;border-bottom:1px solid #1e1e28}
+.ptbl th:first-child{text-align:left}
+.ptbl td{padding:7px 6px;text-align:right;border-bottom:1px solid #131318}
+.ptbl td:first-child{text-align:left;color:#777}
+.cr{color:#ff5252}.cm{color:#ffb74d}.cs{color:#69f0ae}.co{color:#90caf9}
+/* Chips */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.chip{padding:8px 16px;border-radius:20px;border:1px solid #252532;background:#1a1a24;color:#777;font-size:13px;cursor:pointer;touch-action:manipulation}
+.chip.sel{border-color:#ffb74d;color:#ffb74d;background:rgba(255,183,77,.1)}
+.ana-title{font-size:11px;color:#4fc3f7;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">📊 數據</button>
+  <button class="tab-btn" onclick="switchTab(1)">📈 市場情緒</button>
+  <button class="tab-btn" onclick="switchTab(2)">📋 盤前記錄</button>
+  <button class="tab-btn" onclick="switchTab(3)">🎯 分析建議</button>
+</div>
+
+<!-- ══════════ TAB 0: 數據 ══════════ -->
+<div class="pane active" id="tab0">
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+    <button onclick="shiftDate(-1)" style="padding:8px 13px;border-radius:8px;border:1px solid #252532;background:#1a1a24;color:#aaa;font-size:16px;cursor:pointer;touch-action:manipulation">‹</button>
+    <div id="work-date-disp" onclick="document.getElementById('work-date').showPicker?.()" style="flex:1;text-align:center;font-size:15px;font-weight:600;color:#e0e0e0;cursor:pointer;padding:9px 0;background:#1a1a24;border:1px solid #252532;border-radius:8px">—</div>
+    <input type="date" id="work-date" style="display:none" onchange="onDateChange()">
+    <button onclick="shiftDate(1)" style="padding:8px 13px;border-radius:8px;border:1px solid #252532;background:#1a1a24;color:#aaa;font-size:16px;cursor:pointer;touch-action:manipulation">›</button>
+    <button onclick="setWorkDate(0)" style="padding:8px 10px;border-radius:8px;border:1px solid #252532;background:#1a1a24;color:#4fc3f7;font-size:12px;cursor:pointer;touch-action:manipulation;white-space:nowrap">今天</button>
+  </div>
+  <div class="sess-row">
+    <button class="sess-btn active" id="sb0" onclick="setSession('早盤')">☀️ 早盤</button>
+    <button class="sess-btn" id="sb1" onclick="setSession('午盤')">🌙 午/夜盤</button>
+  </div>
+  <button class="btn btn-blue" onclick="fetchAll()">⬇ 自動抓取</button>
+  <div class="fetch-log" id="flog"></div>
+
+  <!-- 台指期 -->
+  <div class="card">
+    <h3>台指期 OHLC</h3>
+    <div class="sub">台指近（日盤）</div>
+    <div class="row4" id="grp-n">
+      <div class="ig"><span class="lbl">開</span><input type="number" id="n-o"><span id="lt-n" class="lock-tag" style="display:none"></span></div>
+      <div class="ig"><span class="lbl">高</span><input type="number" id="n-h"></div>
+      <div class="ig"><span class="lbl">低</span><input type="number" id="n-l"></div>
+      <div class="ig"><span class="lbl">收</span><input type="number" id="n-c"></div>
+    </div>
+    <div class="dvd"></div>
+    <div class="sub">台指近全（全日盤）</div>
+    <div class="row4">
+      <div class="ig"><span class="lbl">開</span><input type="number" id="f-o"><span id="lt-f" class="lock-tag" style="display:none"></span></div>
+      <div class="ig"><span class="lbl">高</span><input type="number" id="f-h"></div>
+      <div class="ig"><span class="lbl">低</span><input type="number" id="f-l"></div>
+      <div class="ig"><span class="lbl">收</span><input type="number" id="f-c"></div>
+    </div>
+    <div class="dvd"></div>
+    <div class="sub">台指PM近（夜盤）</div>
+    <div class="row4">
+      <div class="ig"><span class="lbl">開</span><input type="number" id="p-o"><span id="lt-p" class="lock-tag" style="display:none"></span></div>
+      <div class="ig"><span class="lbl">高</span><input type="number" id="p-h"></div>
+      <div class="ig"><span class="lbl">低</span><input type="number" id="p-l"></div>
+      <div class="ig"><span class="lbl">收</span><input type="number" id="p-c"></div>
+    </div>
+  </div>
+
+  <!-- 三大指標 -->
+  <div class="card">
+    <h3>三大指標</h3>
+    <div class="sub">費半（SOX）</div>
+    <div class="row4">
+      <div class="ig"><span class="lbl">開</span><input type="number" step=".01" id="sox-o"><span id="lt-sox" class="lock-tag" style="display:none"></span></div>
+      <div class="ig"><span class="lbl">高</span><input type="number" step=".01" id="sox-h"></div>
+      <div class="ig"><span class="lbl">低</span><input type="number" step=".01" id="sox-l"></div>
+      <div class="ig"><span class="lbl">收</span><input type="number" step=".01" id="sox-c"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+      <span class="lbl">多空：</span><span id="sox-st" class="badge b-none" onclick="openStatePicker('sox',this)" style="cursor:pointer" title="點擊修改">—</span>
+    </div>
+    <div class="dvd"></div>
+    <div class="sub">加權（TAIEX）</div>
+    <div class="row4">
+      <div class="ig"><span class="lbl">開</span><input type="number" step=".01" id="tai-o"><span id="lt-tai" class="lock-tag" style="display:none"></span></div>
+      <div class="ig"><span class="lbl">高</span><input type="number" step=".01" id="tai-h"></div>
+      <div class="ig"><span class="lbl">低</span><input type="number" step=".01" id="tai-l"></div>
+      <div class="ig"><span class="lbl">收</span><input type="number" step=".01" id="tai-c"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+      <span class="lbl">多空：</span><span id="tai-st" class="badge b-none" onclick="openStatePicker('tai',this)" style="cursor:pointer" title="點擊修改">—</span>
+    </div>
+    <div class="dvd"></div>
+    <div class="sub">櫃加權（OTC）</div>
+    <div class="row4">
+      <div class="ig"><span class="lbl">開</span><input type="number" step=".01" id="otc-o"><span id="lt-otc" class="lock-tag" style="display:none"></span></div>
+      <div class="ig"><span class="lbl">高</span><input type="number" step=".01" id="otc-h"></div>
+      <div class="ig"><span class="lbl">低</span><input type="number" step=".01" id="otc-l"></div>
+      <div class="ig"><span class="lbl">收</span><input type="number" step=".01" id="otc-c"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+      <span class="lbl">多空：</span><span id="otc-st" class="badge b-none" onclick="openStatePicker('otc',this)" style="cursor:pointer" title="點擊修改">—</span>
+    </div>
+  </div>
+
+  <!-- 初始狀態設定 -->
+  <div class="card" id="init-state-card" style="display:none;border-color:#ffb74d44">
+    <h3 style="color:#ffb74d;margin-bottom:12px">⚠️ 找不到前日資料，請手動設定初始狀態</h3>
+    <div id="init-state-body"></div>
+  </div>
+
+  <button class="btn btn-green" id="save-btn" onclick="saveData()">✓ 儲存數據</button>
+
+  <!-- 歷史 -->
+  <div class="card">
+    <div class="sec-hdr">
+      <h3>歷史記錄</h3>
+      <div style="display:flex;gap:12px">
+        <span class="sec-act" onclick="importSeed()">匯入六月</span>
+        <span class="sec-act" style="color:#ff5252" onclick="doClear()">清除</span>
+      </div>
+    </div>
+    <div id="hist"></div>
+  </div>
+</div>
+
+<!-- ══════════ TAB 1: 市場情緒 ══════════ -->
+<div class="pane" id="tab1">
+  <!-- 今日輸入 -->
+  <div class="card">
+    <h3>今日情緒輸入</h3>
+    <div class="row2">
+      <div class="ig"><span class="lbl">外資淨口數（多正空負）</span><input type="number" id="s-fnet-in" placeholder="+5000 或 -3000" oninput="calcSent()"></div>
+      <div class="ig"><span class="lbl">待蒸發點數</span><input type="number" id="s-evap" placeholder="如 350" oninput="calcSent()"></div>
+    </div>
+    <div style="margin-top:8px" class="row2">
+      <div class="ig"><span class="lbl">台指 VIX</span><input type="number" step=".01" id="s-vix" placeholder="如 18.5" oninput="calcSent()"></div>
+      <div class="ig"></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-height:22px">
+      <div id="sc-premium" style="font-size:15px;font-weight:700;color:#aaa">—</div>
+      <div id="sc-contra-short" style="font-size:13px"></div>
+      <div id="sc-vix-short" style="font-size:13px;color:#aaa"></div>
+    </div>
+    <div id="sc-warn" style="display:none;margin-top:8px;padding:9px;background:rgba(255,82,82,.1);border-radius:7px;font-size:12px;color:#ff7070;border-left:3px solid #ff5252;line-height:1.7"></div>
+    <button class="btn btn-green" style="margin-top:10px" onclick="saveSent()">✓ 儲存情緒數據</button>
+  </div>
+
+  <!-- 歷史觀察表 -->
+  <div class="card" style="padding:10px 6px">
+    <div class="sec-hdr" style="padding:0 4px 8px"><h3>歷史觀察</h3><span class="sec-act" onclick="renderSentTable()">重整</span></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table style="border-collapse:collapse;font-size:11px;white-space:nowrap;min-width:100%">
+        <thead>
+          <tr style="color:#555;border-bottom:1px solid #252532">
+            <th style="padding:5px 6px;text-align:left;font-weight:500;position:sticky;left:0;background:#1a1a24;z-index:1">日期</th>
+            <th style="padding:5px 4px;text-align:right;font-weight:500">台指收</th>
+            <th style="padding:5px 4px;text-align:right;font-weight:500">加權</th>
+            <th style="padding:5px 4px;text-align:right;font-weight:500">外資</th>
+            <th style="padding:5px 4px;text-align:right;font-weight:500">正逆差</th>
+            <th style="padding:5px 4px;text-align:right;font-weight:500">差變化</th>
+            <th style="padding:5px 4px;text-align:right;font-weight:500">VIX</th>
+            <th style="padding:5px 6px;text-align:center;font-weight:500">訊號</th>
+          </tr>
+        </thead>
+        <tbody id="sent-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB 2: 盤前記錄 ══════════ -->
+<div class="pane" id="tab2">
+  <div class="card">
+    <div class="sec-hdr"><h3>12 組關鍵價格</h3><span class="sec-act" onclick="renderPrices()">重算</span></div>
+    <table class="ptbl">
+      <thead><tr><th>商品</th><th class="cr">壓力R</th><th class="cm">成本M</th><th class="cs">支撐S</th><th class="co">開盤</th></tr></thead>
+      <tbody>
+        <tr><td>台指近</td><td class="cr" id="t2-n-r">—</td><td class="cm" id="t2-n-m">—</td><td class="cs" id="t2-n-s">—</td><td class="co" id="t2-n-o">—</td></tr>
+        <tr><td>台指近全</td><td class="cr" id="t2-f-r">—</td><td class="cm" id="t2-f-m">—</td><td class="cs" id="t2-f-s">—</td><td class="co" id="t2-f-o">—</td></tr>
+        <tr><td>台指PM</td><td class="cr" id="t2-p-r">—</td><td class="cm" id="t2-p-m">—</td><td class="cs" id="t2-p-s">—</td><td class="co" id="t2-p-o">—</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:7px;font-size:10px;color:#383848">R=高+(高-低)×0.382 ｜ M=(高+低)÷2 ｜ S=低-(高-低)×0.382</div>
+  </div>
+  <div class="card">
+    <h3>三指標多空位階</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+      <div><div style="font-size:11px;color:#555;margin-bottom:5px">費半</div><div id="t2-sox" class="badge b-none">—</div></div>
+      <div><div style="font-size:11px;color:#555;margin-bottom:5px">加權</div><div id="t2-tai" class="badge b-none">—</div></div>
+      <div><div style="font-size:11px;color:#555;margin-bottom:5px">櫃加權</div><div id="t2-otc" class="badge b-none">—</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>市場情緒摘要</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div class="sent-lbl">正逆價差</div><div style="font-size:18px;font-weight:600" id="t2-prem">—</div></div>
+      <div><div class="sent-lbl">矛盾累積</div><div style="font-size:18px;font-weight:600" id="t2-contra">—</div></div>
+      <div><div class="sent-lbl">VIX</div><div style="font-size:18px;font-weight:600" id="t2-vix">—</div></div>
+      <div><div class="sent-lbl">外資淨口數</div><div style="font-size:18px;font-weight:600" id="t2-fnet">—</div></div>
+    </div>
+  </div>
+  <div class="card" id="overlap-card" style="display:none">
+    <h3 style="color:#ffd54f">⚡ 價格重疊</h3>
+    <div id="overlap-list" style="margin-top:6px;font-size:13px;color:#ffd54f;line-height:2"></div>
+  </div>
+  <div class="card">
+    <h3>查看歷史規劃</h3>
+    <select id="hist-sel" onchange="loadHistRec()"><option value="">— 選擇日期 —</option></select>
+  </div>
+</div>
+
+<!-- ══════════ TAB 3: 分析建議 ══════════ -->
+<div class="pane" id="tab3">
+  <div class="card">
+    <h3>前一盤趨勢三角形</h3>
+    <div class="chips">
+      <div class="chip" id="ch-強趨勢" onclick="selTrend('強趨勢')">強趨勢</div>
+      <div class="chip" id="ch-雙巴" onclick="selTrend('雙巴')">雙巴</div>
+      <div class="chip" id="ch-穩趨勢" onclick="selTrend('穩趨勢')">穩趨勢（震盪）</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>上一盤走勢</h3>
+    <div class="row2">
+      <div class="ig"><span class="lbl">方向</span>
+        <select id="pd">
+          <option value="">選擇</option>
+          <option>大漲（>100點）</option><option>小漲（30-100點）</option>
+          <option>平盤（±30點）</option><option>小跌（30-100點）</option><option>大跌（>100點）</option>
+        </select>
+      </div>
+      <div class="ig"><span class="lbl">哪一盤</span>
+        <select id="ps"><option value="夜盤">夜盤</option><option value="早盤">早盤</option></select>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-blue" onclick="genAna()">⚡ 生成分析建議</button>
+  <div id="ana-out"></div>
+</div>
+
+<!-- 狀態選單（浮動） -->
+<div id="state-picker" style="display:none;position:fixed;z-index:999;background:#1e1e2a;border:1px solid #333;border-radius:12px;padding:12px;box-shadow:0 8px 32px #000a">
+  <div style="font-size:11px;color:#555;margin-bottom:10px" id="sp-title">修改狀態</div>
+  <div style="display:flex;flex-direction:column;gap:8px" id="sp-btns"></div>
+  <button onclick="closeStatePicker()" style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid #333;background:#131318;color:#555;font-size:13px;cursor:pointer">取消</button>
+</div>
+<div id="sp-overlay" style="display:none;position:fixed;inset:0;z-index:998" onclick="closeStatePicker()"></div>
+
+<script>
+// ══════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════
+const RK = 'txf_recs_v1', SK = 'txf_states_v1';
+let recs = [], sth = {};
+let curSess = '早盤', selTrendVal = null;
+
+function today() { return new Date().toISOString().split('T')[0]; }
+function getWorkDate() { const v = document.getElementById('work-date')?.value; return v || today(); }
+function updateDateDisp() {
+  const v = getWorkDate();
+  const d = new Date(v+'T00:00:00');
+  const days = ['日','一','二','三','四','五','六'];
+  document.getElementById('work-date-disp').textContent = `${v.slice(5).replace('-','/')} (${days[d.getDay()]})`;
+  const isToday = v === today();
+  document.getElementById('work-date-disp').style.color = isToday ? '#4fc3f7' : '#ffb74d';
+}
+function setWorkDate(offsetDays) {
+  const d = new Date(); d.setDate(d.getDate() + offsetDays);
+  document.getElementById('work-date').value = d.toISOString().split('T')[0];
+  onDateChange();
+}
+function shiftDate(delta) {
+  const cur = new Date(getWorkDate()+'T00:00:00');
+  cur.setDate(cur.getDate() + delta);
+  document.getElementById('work-date').value = cur.toISOString().split('T')[0];
+  onDateChange();
+}
+function onDateChange() { updateDateDisp(); clearAllFields(); prefillForm(curSess); refreshStates(); loadSentRef(); }
+
+function load() {
+  try { recs = JSON.parse(localStorage.getItem(RK)||'[]'); } catch(e){recs=[];}
+  try { sth = JSON.parse(localStorage.getItem(SK)||'{}'); } catch(e){sth={};}
+}
+function save() {
+  localStorage.setItem(RK, JSON.stringify(recs));
+  localStorage.setItem(SK, JSON.stringify(sth));
+}
+
+// ══════════════════════════════════════════
+// MATH
+// ══════════════════════════════════════════
+function fib(h, l) {
+  h = parseFloat(h); l = parseFloat(l);
+  if (!h||!l||isNaN(h)||isNaN(l)||h<=l) return null;
+  const r = h-l;
+  return { r: Math.round(h+r*0.382), m: Math.round((h+l)/2), s: Math.round(l-r*0.382) };
+}
+
+function detState(c, pr, ps, pst) {
+  c=parseFloat(c); pr=parseFloat(pr); ps=parseFloat(ps);
+  if(isNaN(c)||isNaN(pr)||isNaN(ps)) return null;
+  if(c>pr) return '突破多';
+  if(c<ps) return '突破空';
+  if(pst==='突破多'||pst==='維持多') return '維持多';
+  if(pst==='突破空'||pst==='維持空') return '維持空';
+  return null; // 無前日狀態且未突破，無法判斷
+}
+
+function getPrevSth(sym) {
+  const t = getWorkDate();
+  // 午盤計算加權/櫃加：只用今日早盤 record（昨日鎖定值），不用可能過期的舊 sth 資料
+  if((sym==='tai'||sym==='otc') && curSess==='午盤') {
+    const mRec = recs.find(r => r.date===t && r.session==='早盤');
+    if(mRec?.[sym]?.h && mRec?.[sym]?.l && mRec?.[sym]?.c) {
+      const fb = fib(mRec[sym].h, mRec[sym].l);
+      if(fb) return { c: mRec[sym].c, r: fb.r, s: fb.s, state: mRec[sym].state };
+    }
+    // 早盤 record 沒有資料 → 回傳 null，讓 refR/refS fallback 接手，不用舊 sth
+    return null;
+  }
+  // sox 和早盤 session 才走 sth 歷史
+  const dates = Object.keys(sth).filter(d=>d<t).sort().reverse();
+  for (const d of dates) { if(sth[d]?.[sym]) return sth[d][sym]; }
+  // recs 前日記錄 fallback
+  const prevRec = recs
+    .filter(r => r.date < t && r[sym]?.h && r[sym]?.l && r[sym]?.c)
+    .sort((a,b) => b.date.localeCompare(a.date) || b.ts-a.ts)[0];
+  if (prevRec) {
+    const d = prevRec[sym];
+    const fb = fib(d.h, d.l);
+    if (fb) return { c: d.c, r: fb.r, s: fb.s, state: d.state };
+  }
+  return null;
+}
+
+function getVal(id) { const v=document.getElementById(id)?.value; return v?parseFloat(v):null; }
+
+// ══════════════════════════════════════════
+// LOCK / UNLOCK FIELDS
+// ══════════════════════════════════════════
+// groups: n, f, p, sox, tai, otc
+function setFieldsLocked(groups, locked, tag) {
+  groups.forEach(g => {
+    ['o','h','l','c'].forEach(f => {
+      const el = document.getElementById(g+'-'+f);
+      if(el) { el.classList.toggle('locked', locked); el.readOnly = locked; }
+    });
+    const lt = document.getElementById('lt-'+g);
+    if(lt) { lt.style.display = locked&&tag ? 'inline-block' : 'none'; if(tag) lt.textContent = '🔒 '+tag; }
+  });
+}
+
+// ══════════════════════════════════════════
+// SESSION
+// ══════════════════════════════════════════
+function setSession(s) {
+  curSess = s;
+  document.getElementById('sb0').classList.toggle('active', s==='早盤');
+  document.getElementById('sb1').classList.toggle('active', s==='午盤');
+  prefillForm(s);
+}
+
+function prefillForm(sess) {
+  const t = getWorkDate();
+  // 先捕捉目前表單的 p/sox 值（切到午盤時用，避免清空後找不到）
+  const snapP   = {o:getVal('p-o'),  h:getVal('p-h'),  l:getVal('p-l'),  c:getVal('p-c')};
+  const snapSox = {o:getVal('sox-o'),h:getVal('sox-h'),l:getVal('sox-l'),c:getVal('sox-c')};
+  clearAllFields();
+
+  if (sess === '早盤') {
+    // Lock: 台指近、台指近全、加權、櫃加 → from yesterday's 午盤
+    // Editable: 台指PM近、費半
+    const yRec = getLatestRec(null, t, '午盤'); // before today, 午盤
+    if (yRec) {
+      setOHLC('n', yRec.n); setOHLC('f', yRec.f);
+      setOHLC('tai', yRec.tai); setOHLC('otc', yRec.otc);
+      setFieldsLocked(['n','f','tai','otc'], true, '昨日午盤');
+    }
+    setFieldsLocked(['p','sox'], false, null);
+    // 若今天早盤已儲存，全部帶回來（n/f 雖鎖定但同步顯示已存值）
+    const todayMorn = getTodayRec('早盤');
+    if (todayMorn) {
+      setOHLC('n', todayMorn.n); setOHLC('f', todayMorn.f);
+      setOHLC('tai', todayMorn.tai); setOHLC('otc', todayMorn.otc);
+      setOHLC('p', todayMorn.p); setOHLC('sox', todayMorn.sox);
+    }
+
+  } else { // 午盤
+    // Lock: 台指PM近、費半 → from today's 早盤（或目前表單）
+    // Editable: 台指近、台指近全、加權、櫃加
+    const mornRec = getTodayRec('早盤');
+    const pData   = mornRec?.p   || (snapP.c   ? snapP   : null);
+    const soxData = mornRec?.sox || (snapSox.c ? snapSox : null);
+    if (pData)   setOHLC('p',   pData);
+    if (soxData) setOHLC('sox', soxData);
+    if (pData || soxData) setFieldsLocked(['p','sox'], true, '今日早盤');
+    setFieldsLocked(['n','f','tai','otc'], false, null);
+    // If today's 午盤 already saved, fill those too
+    const afRec = getTodayRec('午盤');
+    if (afRec) {
+      setOHLC('n', afRec.n); setOHLC('f', afRec.f);
+      setOHLC('tai', afRec.tai); setOHLC('otc', afRec.otc);
+    }
+  }
+  refreshStates();
+}
+
+function clearAllFields() {
+  ['n','f','p','sox','tai','otc'].forEach(g => {
+    ['o','h','l','c'].forEach(f => {
+      const el = document.getElementById(g+'-'+f);
+      if(el) el.value = '';
+    });
+  });
+  setFieldsLocked(['n','f','p','sox','tai','otc'], false, null);
+}
+
+function setOHLC(pre, d) {
+  if(!d) return;
+  const set = (id, v) => { const el=document.getElementById(id); if(el&&v!=null) el.value=v; };
+  set(pre+'-o',d.o); set(pre+'-h',d.h); set(pre+'-l',d.l); set(pre+'-c',d.c);
+}
+
+// ══════════════════════════════════════════
+// RECORD LOOKUP
+// ══════════════════════════════════════════
+function getTodayRec(sess) {
+  const t = getWorkDate();
+  return recs.find(r => r.date===t && r.session===sess) || null;
+}
+
+function getLatestRec(date, beforeDate, sess) {
+  // Get latest record before beforeDate with given session
+  return recs.filter(r => {
+    if(sess && r.session!==sess) return false;
+    if(date && r.date!==date) return false;
+    if(beforeDate && r.date>=beforeDate) return false;
+    return true;
+  }).sort((a,b)=>b.ts-a.ts)[0] || null;
+}
+
+function getLatestAnyRec() { return recs.sort((a,b)=>b.ts-a.ts)[0] || null; }
+
+// ══════════════════════════════════════════
+// STATES
+// ══════════════════════════════════════════
+function refreshStates() {
+  const t = getWorkDate();
+  ['sox','tai','otc'].forEach(sym => {
+    const c = getVal(sym+'-c');
+    const el = document.getElementById(sym+'-st');
+    if(!c) { el.textContent='—'; el.className='badge b-none'; return; }
+
+    const todaySth = sth[t]?.[sym];
+    const isLocked = !!document.getElementById(sym+'-c')?.readOnly;
+    let st = null;
+
+    if(isLocked) {
+      // 鎖定欄位（早盤的加權/櫃加、午盤的費半）
+      // → 直接讀取歷史儲存的狀態，不重算，manual flag 不干擾
+      if(sym === 'sox') {
+        // 午盤費半鎖定 → 讀今日早盤設的狀態
+        st = todaySth?.state || null;
+      } else {
+        // 早盤加權/櫃加鎖定 → 讀前一交易日的狀態
+        const prevDates = Object.keys(sth).filter(d=>d<t).sort().reverse();
+        for(const d of prevDates) { if(sth[d]?.[sym]?.state) { st=sth[d][sym].state; break; } }
+        if(!st) {
+          const pr = recs.filter(r=>r.date<t&&r[sym]?.state)
+            .sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts)[0];
+          if(pr) st = pr[sym].state;
+        }
+      }
+    } else {
+      // 可編輯欄位（午盤的加權/櫃加、早盤的費半）
+      // 手動設定優先（狀態不變、收盤沒改）
+      if(todaySth?.manual && parseFloat(c) === parseFloat(todaySth.c)) {
+        el.textContent = todaySth.state||'—';
+        el.className = 'badge '+(todaySth.state?'b-'+todaySth.state:'b-none');
+        return;
+      }
+      // → 用前日 H/L 算 R/S，比對今日收盤，自動更新
+      const prev = getPrevSth(sym);
+      if(prev) st = detState(c, prev.r, prev.s, prev.state);
+      // fallback：用 refR/refS（沒有早盤 record 但有 setInitState 設過的昨日值）
+      if(!st && todaySth?.refR && todaySth?.refS)
+        st = detState(c, todaySth.refR, todaySth.refS, todaySth.state);
+    }
+
+    if(!st) st = todaySth?.state || null;
+    el.textContent = st||'—';
+    el.className = 'badge '+(st?'b-'+st:'b-none');
+  });
+  checkInitStates();
+}
+
+const SYM_NAMES = {sox:'費半（SOX）', tai:'加權', otc:'櫃加權'};
+const ALL_STATES = ['突破多','維持多','維持空','突破空'];
+const STATE_COLORS = {'突破多':'#ff5252','維持多':'#ff9800','維持空':'#69f0ae','突破空':'#4fc3f7'};
+
+function checkInitStates() {
+  const missing = ['sox','tai','otc'].filter(sym => {
+    return getVal(sym+'-c') && !sth[getWorkDate()]?.[sym]?.state &&
+           document.getElementById(sym+'-st').textContent === '—';
+  });
+  const card = document.getElementById('init-state-card');
+  if (!missing.length) { card.style.display='none'; return; }
+  card.style.display = 'block';
+  document.getElementById('init-state-body').innerHTML = missing.map(sym => `
+    <div style="margin-bottom:14px">
+      <div style="font-size:13px;color:#ccc;margin-bottom:8px">${SYM_NAMES[sym]}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${ALL_STATES.map(st => `
+          <button onclick="setInitState('${sym}','${st}')"
+            style="padding:8px 16px;border-radius:20px;border:1px solid ${STATE_COLORS[st]}44;
+                   background:${STATE_COLORS[st]}15;color:${STATE_COLORS[st]};
+                   font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation">
+            ${st}
+          </button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function setInitState(sym, st) {
+  const t = getWorkDate();
+  if (!sth[t]) sth[t] = {};
+  const h = getVal(sym+'-h'), l = getVal(sym+'-l'), c = getVal(sym+'-c');
+  const fb = fib(h, l);
+  // refR/refS = 算此狀態用的前日 R/S（早盤鎖定欄位 = 昨日值）
+  sth[t][sym] = { c, r: fb?.r||null, s: fb?.s||null, state: st, refR: fb?.r||null, refS: fb?.s||null, manual: true };
+  save();
+  refreshStates();
+}
+
+['sox','tai','otc'].forEach(sym => {
+  ['o','h','l','c'].forEach(f => {
+    const el = document.getElementById(sym+'-'+f);
+    if(el) el.addEventListener('input', refreshStates);
+  });
+});
+
+function openStatePicker(sym, badgeEl) {
+  const names = {sox:'費半（SOX）', tai:'加權', otc:'櫃加權'};
+  document.getElementById('sp-title').textContent = names[sym] + ' — 選擇狀態';
+  const btns = document.getElementById('sp-btns');
+  const cur = badgeEl.textContent;
+  btns.innerHTML = ALL_STATES.map(st => `
+    <button onclick="setInitState('${sym}','${st}');closeStatePicker()"
+      style="padding:11px 16px;border-radius:8px;border:1px solid ${STATE_COLORS[st]}55;
+             background:${STATE_COLORS[st]}18;color:${STATE_COLORS[st]};
+             font-size:14px;font-weight:600;cursor:pointer;text-align:left;
+             ${st===cur?'outline:2px solid '+STATE_COLORS[st]+';':''}">${st}${st===cur?' ✓':''}</button>
+  `).join('');
+  // 定位在 badge 附近
+  const rect = badgeEl.getBoundingClientRect();
+  const picker = document.getElementById('state-picker');
+  picker.style.display = 'block';
+  document.getElementById('sp-overlay').style.display = 'block';
+  const top = Math.min(rect.bottom + 6, window.innerHeight - 260);
+  picker.style.top = top + 'px';
+  picker.style.left = Math.max(8, rect.left) + 'px';
+}
+
+function closeStatePicker() {
+  document.getElementById('state-picker').style.display = 'none';
+  document.getElementById('sp-overlay').style.display = 'none';
+}
+
+// ══════════════════════════════════════════
+// SAVE DATA (Tab 0)
+// ══════════════════════════════════════════
+function buildOHLC(pre, round) {
+  const g = f => { const v=document.getElementById(pre+'-'+f)?.value; return v?(round?Math.round(parseFloat(v)):parseFloat(v)):null; };
+  return {o:g('o'), h:g('h'), l:g('l'), c:g('c')};
+}
+
+function buildSymData(sym) {
+  const c = getVal(sym+'-c'), h = getVal(sym+'-h'), l = getVal(sym+'-l');
+  const fb = fib(h, l);
+  const prev = getPrevSth(sym);
+  let state = null;
+  if(prev && c) {
+    state = detState(c, prev.r, prev.s, prev.state);
+  } else if(c) {
+    const todaySth = sth[getWorkDate()]?.[sym];
+    if(todaySth?.refR && todaySth?.refS)
+      state = detState(c, todaySth.refR, todaySth.refS, todaySth.state);
+    if(!state) state = todaySth?.state || null;
+  }
+  return { o:getVal(sym+'-o'), h, l, c, state, r:fb?.r||null, s:fb?.s||null };
+}
+
+function saveData() {
+  const t = getWorkDate();
+  const sox = buildSymData('sox'), tai = buildSymData('tai'), otc = buildSymData('otc');
+
+  // Build merged record
+  let rec = recs.find(r=>r.date===t&&r.session===curSess);
+  if(!rec) {
+    rec = { date:t, session:curSess, ts:Date.now(), n:{}, f:{}, p:{}, sox:{}, tai:{}, otc:{}, sent:{} };
+    recs.push(rec);
+  }
+  rec.ts = Date.now();
+
+  if(curSess === '早盤') {
+    // Update PM近 and 費半 (the new data)
+    rec.p = buildOHLC('p', true);
+    rec.sox = sox;
+    // Carry over from yesterday for display
+    const yRec = getLatestRec(null, t, '午盤');
+    rec.n = yRec?.n || buildOHLC('n', true);
+    rec.f = yRec?.f || buildOHLC('f', true);
+    rec.tai = yRec?.tai || tai;
+    rec.otc = yRec?.otc || otc;
+  } else {
+    // Update 台指近/近全/加權/櫃加
+    rec.n = buildOHLC('n', true);
+    rec.f = buildOHLC('f', true);
+    rec.tai = tai;
+    rec.otc = otc;
+    // Carry PM近 and 費半 from morning
+    const mRec = getTodayRec('早盤');
+    rec.p = mRec?.p || buildOHLC('p', true);
+    rec.sox = mRec?.sox || sox;
+  }
+
+  // Update state history（保留手動設定的狀態，不被 null 蓋掉）
+  if(!sth[t]) sth[t] = {};
+  ['sox','tai','otc'].forEach(sym => {
+    if(rec[sym]?.c) {
+      const st = rec[sym].state || sth[t]?.[sym]?.state || null;
+      // 保留 refR/refS（setInitState 時存入的前日 R/S），不被今日 fib 蓋掉
+      const refR = sth[t]?.[sym]?.refR || null;
+      const refS = sth[t]?.[sym]?.refS || null;
+      // manual 旗標儲存後清除（已有計算值，不再需要保護）
+      sth[t][sym] = { c:rec[sym].c, r:rec[sym].r, s:rec[sym].s, state:st, refR, refS };
+      // 同步回 rec，讓後續天的 getPrevSth fallback 也能拿到正確 state
+      rec[sym].state = st;
+    }
+  });
+
+  recs.sort((a,b) => b.date.localeCompare(a.date) || (b.session==='午盤'?1:0)-(a.session==='午盤'?1:0));
+  save(); renderHist(); updateHistSel();
+  renderTab2(rec);
+
+  const btn = document.getElementById('save-btn');
+  btn.textContent='✓ 已儲存！'; btn.style.background='#2e7d32';
+  setTimeout(()=>{btn.textContent='✓ 儲存數據'; btn.style.background='#69f0ae';}, 2000);
+}
+
+// ══════════════════════════════════════════
+// HISTORY RENDER (Tab 0)
+// ══════════════════════════════════════════
+function renderHist() {
+  const cont = document.getElementById('hist');
+  if(!recs.length) { cont.innerHTML='<div style="color:#444;text-align:center;padding:18px;font-size:13px">尚無記錄</div>'; return; }
+  cont.innerHTML = recs.slice(0,40).map((r,i) => {
+    const bgs = ['sox','tai','otc'].map(sym => {
+      const st = r[sym]?.state;
+      return st?`<span class="badge b-${st}" style="font-size:10px;padding:2px 6px">${st}</span>`:'';
+    }).join(' ');
+    return `<div class="hist-item" onclick="toggleDet(this)">
+      <div style="display:flex;justify-content:space-between">
+        <div><span style="font-size:12px;color:#555">${r.date} ${r.session}</span><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">${bgs}</div></div>
+        <span style="color:#333;font-size:12px">▼</span>
+      </div>
+      <div class="hist-det">
+        ${oRow('台指近',r.n)}${oRow('台指近全',r.f)}${oRow('台指PM',r.p)}
+        <div style="height:1px;background:#1e1e28;margin:6px 0"></div>
+        ${oRow('費半',r.sox)}${oRow('加權',r.tai)}${oRow('櫃加',r.otc)}
+        ${r.sent?.premium!=null?`<div style="font-size:12px;color:#666;margin-top:6px">正逆價差：${r.sent.premium>0?'+':''}${r.sent.premium}點 ｜ VIX：${r.sent.vix||'—'} ｜ 矛盾：${r.sent.contradictionCount||0}</div>`:''}
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-gray" style="padding:8px;font-size:12px;margin:0" onclick="loadRec(event,${i})">載入此筆</button>
+          <button class="btn" style="padding:8px;font-size:12px;margin:0;background:rgba(255,82,82,.12);color:#ff5252;border:1px solid rgba(255,82,82,.3);border-radius:8px" onclick="deleteRec(event,${i})">刪除</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function oRow(lbl, d) {
+  if(!d) return '';
+  return `<div style="font-size:15px;margin-bottom:5px;display:flex;justify-content:space-between"><span style="color:#555;min-width:60px">${lbl}</span><span>開<b>${d.o??'—'}</b> 高<b>${d.h??'—'}</b> 低<b>${d.l??'—'}</b> 收<b>${d.c??'—'}</b></span></div>`;
+}
+
+function toggleDet(el) { el.querySelector('.hist-det').classList.toggle('open'); }
+
+function loadRec(e, i) {
+  e.stopPropagation();
+  const r = recs[i]; if(!r) return;
+
+  // 更新日期與盤別
+  document.getElementById('work-date').value = r.date;
+  updateDateDisp();
+  curSess = r.session;
+  document.getElementById('sb0').classList.toggle('active', r.session === '早盤');
+  document.getElementById('sb1').classList.toggle('active', r.session !== '早盤');
+
+  setOHLC('n',r.n); setOHLC('f',r.f); setOHLC('p',r.p);
+  setOHLC('sox',r.sox); setOHLC('tai',r.tai); setOHLC('otc',r.otc);
+  setFieldsLocked(['n','f','p','sox','tai','otc'], false, null);
+  // 載入既有記錄時，直接顯示已儲存的狀態，不重算（避免前日資料缺失導致算錯）
+  ['sox','tai','otc'].forEach(sym => {
+    const st = r[sym]?.state || null;
+    const el = document.getElementById(sym+'-st');
+    el.textContent = st||'—';
+    el.className = 'badge '+(st?'b-'+st:'b-none');
+    // 同步 sth manual flag，保護狀態不被後續 refreshStates 覆蓋
+    if(st) {
+      if(!sth[r.date]) sth[r.date] = {};
+      const ex = sth[r.date][sym] || {};
+      sth[r.date][sym] = {...ex, c:r[sym]?.c, state:st, manual:true};
+    }
+  });
+  document.getElementById('init-state-card').style.display = 'none';
+  switchTab(0);
+}
+
+function deleteRec(e, i) {
+  e.stopPropagation();
+  const r = recs[i]; if(!r) return;
+  recs.splice(i, 1);
+  // Clean up state history if no more records for that date
+  if(!recs.some(x=>x.date===r.date)) delete sth[r.date];
+  save(); renderHist(); updateHistSel();
+}
+
+function updateHistSel() {
+  const sel = document.getElementById('hist-sel');
+  sel.innerHTML = '<option value="">— 選擇日期 —</option>' +
+    recs.map((r,i)=>`<option value="${i}">${r.date} ${r.session}</option>`).join('');
+}
+
+function loadHistRec() {
+  const i = document.getElementById('hist-sel').value;
+  renderTab2(i!==''?recs[parseInt(i)]:recs[0]);
+}
+
+function doClear() {
+  if(confirm('清除所有歷史記錄？')) { recs=[]; sth={}; save(); renderHist(); updateHistSel(); }
+}
+
+// ══════════════════════════════════════════
+// MARKET SENTIMENT (Tab 1)
+// ══════════════════════════════════════════
+
+function clearSentInputs() {
+  ['s-fnet-in','s-evap','s-vix'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const w=document.getElementById('sc-warn'); if(w) w.style.display='none';
+  const p=document.getElementById('sc-premium'); if(p){p.textContent='—';p.style.color='#aaa';}
+  const c=document.getElementById('sc-contra-short'); if(c) c.textContent='';
+  const v=document.getElementById('sc-vix-short'); if(v) v.textContent='';
+  window._sentCalc = null;
+}
+
+function loadSentRef() {
+  clearSentInputs();
+  const todaySent = (getTodayRec('午盤') || getTodayRec('早盤'))?.sent;
+  if(todaySent) {
+    if(todaySent.fnet!=null) document.getElementById('s-fnet-in').value = todaySent.fnet;
+    if(todaySent.evaporation!=null) document.getElementById('s-evap').value = todaySent.evaporation;
+    if(todaySent.vix) document.getElementById('s-vix').value = todaySent.vix;
+    calcSent();
+  }
+  renderSentTable();
+}
+
+function calcSent() {
+  const t = getWorkDate();
+  const todayRec = getTodayRec('午盤') || getTodayRec('早盤');
+  const txfC = todayRec?.n?.c || todayRec?.f?.c || todayRec?.p?.c;
+  const taiC = todayRec?.tai?.c;
+  const evap = getVal('s-evap') || 0;
+  const fnetRaw = document.getElementById('s-fnet-in').value;
+  const fnet = fnetRaw !== '' ? (getVal('s-fnet-in') ?? 0) : null;
+  const vix = getVal('s-vix');
+
+  // Premium
+  const premium = (txfC && taiC) ? Math.round(txfC - taiC + evap) : null;
+  const pEl = document.getElementById('sc-premium');
+  if(premium!=null) {
+    pEl.textContent = (premium>0?'+':'')+premium+'點 '+(premium>0?'正價差':'逆價差');
+    pEl.style.color = premium>0?'#ff5252':'#4fc3f7';
+  } else { pEl.textContent = txfC&&taiC ? '—' : '需先儲存台指+加權數據'; pEl.style.color='#555'; }
+
+  // VIX
+  const vEl = document.getElementById('sc-vix-short');
+  if(vix) { vEl.textContent='VIX '+vix; vEl.style.color=vix>25?'#ff5252':vix>20?'#ffb74d':'#69f0ae'; }
+  else vEl.textContent='';
+
+  // Prev premium for contradiction calc
+  const prevRec = getLatestRec(null, t, '午盤') || getLatestRec(null, t, '早盤');
+  const prevPrem = prevRec?.sent?.premium;
+  const switched = (premium!=null && prevPrem!=null) ? (premium>0)!==(prevPrem>0) : false;
+
+  let hasCont=false, premChg=null;
+  if(premium!=null && prevPrem!=null) {
+    premChg = premium - prevPrem;
+    // 矛盾：外資口數 ≥500 且方向與價差變化相反
+    if(fnet!=null && Math.abs(fnet)>=500) {
+      hasCont = (fnet>0 && premChg<0) || (fnet<0 && premChg>0);
+    }
+  }
+
+  const prevSent = prevRec?.sent;
+  // 價差轉換歸零，否則累計；今天有矛盾才+1
+  let prevCount = switched ? 0 : (prevSent?.contradictionCount||0);
+  const count = hasCont ? prevCount+1 : prevCount;
+
+  const cEl = document.getElementById('sc-contra-short');
+  if(hasCont) { cEl.textContent=`⚠️ 矛盾（累積${count}個）`; cEl.style.color='#ff9800'; }
+  else if(count>0) { cEl.textContent=`矛盾延續中（${count}個）`; cEl.style.color='#ffb74d'; }
+  else cEl.textContent='';
+
+  // Warnings
+  const warns=[];
+  if(premium!=null&&Math.abs(premium)>500) warns.push(`⚠️ 正逆價差 ${Math.abs(premium)}點，SP 安全距離需額外扣除！`);
+  if(switched) warns.push('⚠️ 正逆價差轉換！矛盾計數歸零！');
+  if(count>=3) warns.push('⚠️ 矛盾達3個，反轉率極高，考慮買方搏反轉');
+  const wEl=document.getElementById('sc-warn');
+  if(warns.length){wEl.style.display='block';wEl.innerHTML=warns.join('<br>');}else wEl.style.display='none';
+
+  window._sentCalc = {
+    fnet: fnet??null, evaporation:evap, vix,
+    premium, premiumStatus:premium!=null?(premium>0?'正價差':'逆價差'):null,
+    premiumChange:premChg!=null?Math.round(premChg):null,
+    premiumSwitch:switched, hasContradiction:hasCont,
+    contradictionCount:count
+  };
+}
+
+// 計算單筆 record 的情緒數值（供表格用）
+function calcSentForRec(rec, prevPremium, prevCount) {
+  const txfC = rec.n?.c || rec.f?.c || rec.p?.c;
+  const taiC = rec.tai?.c;
+  const evap = rec.sent?.evaporation || 0;
+  const fnet = rec.sent?.fnet ?? null;
+  const vix  = rec.sent?.vix  ?? null;
+  const premium = (txfC&&taiC) ? Math.round(txfC-taiC+evap) : null;
+  const premChange = (premium!=null&&prevPremium!=null) ? premium-prevPremium : null;
+  const switched = (premium!=null&&prevPremium!=null) ? (premium>0)!==(prevPremium>0) : false;
+  let hasCont = false;
+  if(premium!=null && fnet!=null && premChange!=null && Math.abs(fnet)>=500) {
+    hasCont = (fnet>0&&premChange<0)||(fnet<0&&premChange>0);
+  }
+  const base = switched ? 0 : (prevCount||0);
+  const count = hasCont ? base+1 : base;
+  return {txfC,taiC,fnet,vix,premium,premChange,switched,hasCont,count};
+}
+
+function renderSentTable() {
+  const tbody = document.getElementById('sent-tbody');
+  if(!tbody) return;
+  // 每個日期只取最完整的記錄（午盤優先）
+  const byDate = {};
+  [...recs].sort((a,b)=>a.date.localeCompare(b.date)||(a.session==='午盤'?1:-1))
+    .forEach(r => { if(r.n?.c||r.f?.c||r.p?.c) byDate[r.date]=r; });
+  const dates = Object.keys(byDate).sort();
+  let prevPrem = null, prevCount = 0;
+  const rows = dates.map(date => {
+    const rec = byDate[date];
+    const {txfC,taiC,fnet,vix,premium,premChange,switched,hasCont,count} = calcSentForRec(rec, prevPrem, prevCount);
+    if(premium!=null) prevPrem=premium;
+    prevCount = count;
+    const ds = date.slice(5).replace('-','/');
+    const pCol = premium>0?'#ff5252':premium<0?'#4fc3f7':'#aaa';
+    const cCol = premChange>0?'#ff5252':premChange<0?'#69f0ae':'#aaa';
+    const vCol = vix>25?'#ff5252':vix>20?'#ffb74d':'#69f0ae';
+    const fCol = fnet>0?'#ff5252':fnet<0?'#69f0ae':'#aaa';
+    let sig='';
+    if(hasCont) sig+=`<span style="color:#ff9800;font-size:10px">矛${count}</span>`;
+    if(switched) sig+=`<span style="color:#4fc3f7;font-size:10px${hasCont?' margin-left:2px':''}">轉</span>`;
+    if(!hasCont&&!switched&&count>0) sig+=`<span style="color:#555;font-size:10px">${count}</span>`;
+    if(!sig) sig='<span style="color:#252532">—</span>';
+    return `<tr style="border-bottom:1px solid #1a1a22">
+      <td style="padding:5px 6px;color:#aaa;position:sticky;left:0;background:#1a1a24;z-index:1">${ds}</td>
+      <td style="padding:5px 4px;text-align:right;color:#ccc">${txfC?Math.round(txfC).toLocaleString():'—'}</td>
+      <td style="padding:5px 4px;text-align:right;color:#777">${taiC?Math.round(taiC).toLocaleString():'—'}</td>
+      <td style="padding:5px 4px;text-align:right;color:${fCol}">${fnet!=null?(fnet>0?'+':'')+fnet.toLocaleString():'—'}</td>
+      <td style="padding:5px 4px;text-align:right;color:${pCol};font-weight:600">${premium!=null?(premium>0?'+':'')+premium:'—'}</td>
+      <td style="padding:5px 4px;text-align:right;color:${cCol}">${premChange!=null?(premChange>0?'+':'')+premChange:'—'}</td>
+      <td style="padding:5px 4px;text-align:right;color:${vCol}">${vix||'—'}</td>
+      <td style="padding:5px 6px;text-align:center">${sig}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = rows.reverse().join(''); // 最新在上
+}
+
+function saveSent() {
+  if(!window._sentCalc) { calcSent(); }
+  const t = getWorkDate();
+  let rec = recs.find(r=>r.date===t&&r.session==='午盤') || recs.find(r=>r.date===t&&r.session==='早盤');
+  if(!rec) { alert('請先在「數據」頁籤儲存今日數據'); return; }
+  rec.sent = { ...rec.sent, ...window._sentCalc };
+  save();
+  renderSentTable();
+  const btn = document.querySelector('#tab1 .btn-green');
+  btn.textContent='✓ 已儲存！'; btn.style.background='#2e7d32';
+  setTimeout(()=>{btn.textContent='✓ 儲存情緒數據'; btn.style.background='#69f0ae';}, 2000);
+}
+
+// ══════════════════════════════════════════
+// TAB 2: PRICES
+// ══════════════════════════════════════════
+function renderPrices() { renderTab2(recs[0]); }
+
+function renderTab2(rec) {
+  rec = rec || recs[0];
+  if(!rec) return;
+
+  const prods = [{data:rec.n,pre:'n'},{data:rec.f,pre:'f'},{data:rec.p,pre:'p'}];
+  let allPrices = [];
+  prods.forEach(({data,pre}) => {
+    if(!data?.h||!data?.l) { ['r','m','s','o'].forEach(k=>{document.getElementById('t2-'+pre+'-'+k).textContent='—';}); return; }
+    const fb = fib(data.h, data.l); if(!fb) return;
+    const names={n:'台指近',f:'台指近全',p:'台指PM'};
+    document.getElementById('t2-'+pre+'-r').textContent=fb.r.toLocaleString();
+    document.getElementById('t2-'+pre+'-m').textContent=fb.m.toLocaleString();
+    document.getElementById('t2-'+pre+'-s').textContent=fb.s.toLocaleString();
+    document.getElementById('t2-'+pre+'-o').textContent=data.o?Math.round(data.o).toLocaleString():'—';
+    allPrices.push({n:names[pre],t:'R',v:fb.r},{n:names[pre],t:'M',v:fb.m},{n:names[pre],t:'S',v:fb.s});
+  });
+
+  // States
+  [{sym:'sox',id:'t2-sox'},{sym:'tai',id:'t2-tai'},{sym:'otc',id:'t2-otc'}].forEach(({sym,id}) => {
+    const st = rec[sym]?.state||'—';
+    const el = document.getElementById(id);
+    el.textContent=st; el.className='badge '+(st!=='—'?'b-'+st:'b-none');
+  });
+
+  // Sentiment summary
+  const s = rec.sent||{};
+  const pEl = document.getElementById('t2-prem');
+  if(s.premium!=null){pEl.textContent=(s.premium>0?'+':'')+s.premium+'點';pEl.style.color=s.premium>0?'#ff5252':'#4fc3f7';}else pEl.textContent='—';
+  document.getElementById('t2-contra').textContent = s.contradictionCount!=null?s.contradictionCount+'個':'—';
+  const vEl=document.getElementById('t2-vix');
+  if(s.vix){vEl.textContent=s.vix;vEl.style.color=s.vix>25?'#ff5252':s.vix>20?'#ffb74d':'#69f0ae';}else vEl.textContent='—';
+  const fEl=document.getElementById('t2-fnet');
+  if(s.fnet!=null){fEl.textContent=(s.fnet>0?'+':'')+s.fnet;fEl.style.color=s.fnet>0?'#ff5252':'#69f0ae';}else fEl.textContent='—';
+
+  // Overlaps
+  const ovlp=[];
+  for(let i=0;i<allPrices.length;i++) for(let j=i+1;j<allPrices.length;j++) {
+    if(Math.abs(allPrices[i].v-allPrices[j].v)<=50) ovlp.push(`${allPrices[i].n} ${allPrices[i].t}(${allPrices[i].v}) ≈ ${allPrices[j].n} ${allPrices[j].t}(${allPrices[j].v})`);
+  }
+  document.getElementById('overlap-card').style.display=ovlp.length?'block':'none';
+  document.getElementById('overlap-list').innerHTML=ovlp.map(o=>`<div>⚡ ${o}</div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// TAB 3: ANALYSIS
+// ══════════════════════════════════════════
+function selTrend(t) {
+  selTrendVal=t;
+  ['強趨勢','雙巴','穩趨勢'].forEach(x=>document.getElementById('ch-'+x).classList.toggle('sel',x===t));
+}
+
+function genAna() {
+  const rec = recs[0];
+  if(!rec){document.getElementById('ana-out').innerHTML='<div style="color:#ff5252;padding:14px;font-size:13px">請先在「數據」頁籤儲存今日數據</div>';return;}
+
+  const out=[], bull=['突破多','維持多'];
+  const sts=[rec.sox?.state,rec.tai?.state,rec.otc?.state];
+  const bullCnt=sts.filter(s=>bull.includes(s)).length;
+  const bearCnt=sts.filter(s=>['突破空','維持空'].includes(s)).length;
+  const brkBull=sts.filter(s=>s==='突破多').length;
+  const brkBear=sts.filter(s=>s==='突破空').length;
+
+  // 維度一
+  let d1='',d1s='neu';
+  if(bullCnt===3){d1s='bull';d1=`三指同向多\n費半：${rec.sox?.state} ｜ 加權：${rec.tai?.state} ｜ 櫃加：${rec.otc?.state}\n`;d1+=brkBull>=2?'多方力道極強，突破行情，⛔禁止SC。':'多方慣性延續，偏多操作。';}
+  else if(bearCnt===3){d1s='bear';d1=`三指同向空\n費半：${rec.sox?.state} ｜ 加權：${rec.tai?.state} ｜ 櫃加：${rec.otc?.state}\n`;d1+=brkBear>=2?'空方力道極強，突破行情，⛔禁止SP。':'空方慣性延續，偏空操作。';}
+  else{d1s='neu';d1=`三指方向不一\n費半：${rec.sox?.state||'—'} ｜ 加權：${rec.tai?.state||'—'} ｜ 櫃加：${rec.otc?.state||'—'}\n震盪盤，多空雙做：壓力空，支撐多。`;}
+  out.push({title:'▍ 維度一：多空位階',text:d1,sig:d1s});
+
+  // 維度二
+  let d2='';
+  if(selTrendVal){
+    const nx={強趨勢:'→ 等待雙巴（最高確定性反向訊號）',雙巴:'→ 進入穩趨勢（震盪整理）',穩趨勢:'→ 等待新一波強趨勢（方向未知）'};
+    const ac={強趨勢:'趨勢盤：5分8均跟抱，8均破才出。',雙巴:'雙巴後觀望，等穩趨勢選方向。',穩趨勢:'震盪盤：碰5分21均就出，不凹。'};
+    d2=`前一盤：${selTrendVal}\n${nx[selTrendVal]}\n\n操作：${ac[selTrendVal]}`;
+  } else d2='請在上方選擇前一盤趨勢形態。';
+  out.push({title:'▍ 維度二：趨勢三角形',text:d2,sig:'neu'});
+
+  // 維度三
+  const pd = document.getElementById('pd').value;
+  const ps = document.getElementById('ps').value;
+  let d3='',d3s='neu';
+  if(pd){
+    const mp={大漲:{心:'主力可能追高',判:'下一盤壓回洗盤/出貨',s:'bear'},小漲:{心:'多單小獲利',判:'繼續推高或震盪',s:'neu'},平盤:{心:'觀望',判:'等待方向',s:'neu'},小跌:{心:'空單小獲利',判:'繼續壓低或反彈',s:'neu'},大跌:{心:'多單被套',判:`${ps==='夜盤'?'早盤':'夜盤'}可能拉高出貨（主力解套）`,s:'bull'}};
+    const key=pd.replace(/（.*）/,'');
+    const m=Object.entries(mp).find(([k])=>pd.startsWith(k))?.[1];
+    if(m){d3s=m.s;d3=`${ps}${key}\n主力心態：${m.心}\n預判下一盤：${m.判}\n`;}
+  }
+  const mf=fib(rec.n?.h,rec.n?.l);
+  if(mf&&rec.n?.c){d3+=`\nM（主力成本）= ${mf.m.toLocaleString()}\n`;d3+=rec.n.c>mf.m?`收盤 ${rec.n.c} > M → M 轉支撐（掛多參考）`:`收盤 ${rec.n.c} < M → M 轉壓力（掛空參考）`;}
+  if(!d3) d3='請在上方選擇上一盤走勢方向。';
+  out.push({title:'▍ 維度三：主力思維',text:d3,sig:d3s});
+
+  // 維度四（from sent）
+  const s=rec.sent||{};
+  let d4='',d4s=s.contradictionCount>=2?'warn':'neu';
+  if(s.premium!=null) d4+=`正逆價差：${s.premium>0?'+':''}${s.premium}點（${s.premiumStatus||''}）\n`;
+  if(s.fnet!=null) d4+=`外資淨口數：${s.fnet>0?'+':''}${s.fnet}口\n`;
+  if(s.vix) d4+=`VIX：${s.vix}（${s.vix>25?'⚠️高波動':s.vix>20?'中度':'低波動'}）\n`;
+  d4+=`矛盾累積：${s.contradictionCount||0}個`;
+  if(s.premiumSwitch) d4+='\n⚠️ 正逆價差轉換，矛盾歸零！';
+  if(!s.premium&&!s.vix) d4='請先在「市場情緒」頁籤填入數據。';
+  out.push({title:'▍ 維度四：市場情緒',text:d4,sig:d4s});
+
+  // 信心
+  let conf=0;
+  if(bullCnt===3||bearCnt===3) conf++;
+  if(selTrendVal==='強趨勢') conf++;
+  if(pd&&!pd.startsWith('平盤')) conf++;
+  if((s.contradictionCount||0)===0) conf++;
+  const cm=[{t:'信心 0/4 → 不建議進場',c:'#555'},{t:'信心 1/4 → 掛最遠或觀望',c:'#90caf9'},{t:'信心 2/4 → 掛第二或第三個價位',c:'#ffb74d'},{t:'信心 3/4 → 掛第一或第二個價位',c:'#ff9800'},{t:'信心 4/4 → 最積極，掛第一壓力/支撐',c:'#ff5252'}];
+  out.push({title:'▍ 信心程度',text:cm[conf].t,sig:'neu',col:cm[conf].c});
+
+  // 掛單
+  const prods2=[{name:'台指近',d:rec.n},{name:'台指近全',d:rec.f},{name:'台指PM',d:rec.p}];
+  let longO=[],shortO=[];
+  prods2.forEach(({name,d})=>{
+    if(!d?.h||!d?.l) return;
+    const fb=fib(d.h,d.l); if(!fb) return;
+    const amp=d.h-d.l, cr=d.c||((d.h+d.l)/2), min=amp/3;
+    if(Math.abs(fb.s-cr)>=min) longO.push({lbl:`${name} S`,v:fb.s,dist:Math.round(Math.abs(fb.s-cr))});
+    if(Math.abs(fb.m-cr)>=min){if(cr>fb.m)shortO.push({lbl:`${name} M`,v:fb.m,dist:Math.round(Math.abs(fb.m-cr))});else longO.push({lbl:`${name} M`,v:fb.m,dist:Math.round(Math.abs(fb.m-cr))});}
+    if(Math.abs(fb.r-cr)>=min) shortO.push({lbl:`${name} R`,v:fb.r,dist:Math.round(Math.abs(fb.r-cr))});
+  });
+  longO.sort((a,b)=>b.v-a.v); shortO.sort((a,b)=>a.v-b.v);
+  const abc=['A（積極）','B（保守）','C（最保守）'];
+  let ord='';
+  if(bullCnt>=bearCnt&&longO.length){ord+='做多掛單（支撐/成本）：\n';longO.slice(0,3).forEach((o,i)=>ord+=`  ${abc[i]||''}. ${o.v.toLocaleString()} — ${o.lbl}，距${o.dist}點\n`);}
+  if(bearCnt>=bullCnt&&shortO.length){ord+='做空掛單（壓力/成本）：\n';shortO.slice(0,3).forEach((o,i)=>ord+=`  ${abc[i]||''}. ${o.v.toLocaleString()} — ${o.lbl}，距${o.dist}點\n`);}
+  if(!ord) ord='數據不足或方向不明，建議觀望。';
+  ord+='\n⚠️ 停損 50-100點，穿價即停損不凹';
+  out.push({title:'▍ 掛單建議',text:ord,sig:'neu'});
+
+  // 選擇權
+  let opt='',opts='neu';
+  if(brkBull>0){opt+='⛔ 突破多 → 禁止 SC（賣出買權）\n';opts='warn';}
+  if(brkBear>0){opt+='⛔ 突破空 → 禁止 SP（賣出賣權）\n';opts='warn';}
+  if(!brkBull&&!brkBear){
+    opt+='✅ 無突破，賣方可操作：\n';
+    if(s.vix>25) opt+=`  VIX ${s.vix}>25，權利金豐厚 ✓\n`;
+    else if(s.vix<20) opt+=`  VIX ${s.vix}<20，考慮買方或雙買\n`;
+    if(bullCnt===3) opt+='  三指同多 → 可 SP 收租（注意正逆價差安全距離）';
+    else if(bearCnt===3) opt+='  三指同空 → 可 SC 收租';
+    else opt+='  震盪盤 → 適合雙賣（SC+SP）';
+  }
+  if((s.contradictionCount||0)>=2){opt+=`\n\n⚠️ 矛盾${s.contradictionCount}個，考慮買方搏反轉`;opts='warn';}
+  out.push({title:'▍ 選擇權建議',text:opt,sig:opts});
+
+  const sc={bull:'sig-bull',bear:'sig-bear',warn:'sig-warn',neu:'sig-neu'};
+  document.getElementById('ana-out').innerHTML = out.map(o=>`
+    <div class="ana-title">${o.title}</div>
+    <div class="signal-box ${sc[o.sig]||'sig-neu'}" style="white-space:pre-line${o.col?';color:'+o.col:''}">${o.text}</div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════
+// API FETCH
+// ══════════════════════════════════════════
+async function fetchAll() {
+  const log=document.getElementById('flog');
+  log.innerHTML='<span class="loading"><span class="spinner"></span> 抓取中...</span>';
+  const msgs=[];
+  try {
+    const r=await fetch('https://scanner.tradingview.com/global/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symbols:{tickers:['TAIFEX:TXF1!','TVC:SOX','TWSE:IX0001','TPEX:IX0043']},columns:['open','high','low','close']})});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j=await r.json(); const tv={};
+    (j.data||[]).forEach(item=>{tv[item.s]={o:item.d[0],h:item.d[1],l:item.d[2],c:item.d[3]};});
+    if(tv['TVC:SOX']) setOHLC('sox',tv['TVC:SOX']);
+    if(tv['TWSE:IX0001']) setOHLC('tai',{o:tv['TWSE:IX0001'].o,h:tv['TWSE:IX0001'].h,l:tv['TWSE:IX0001'].l,c:tv['TWSE:IX0001'].c});
+    if(tv['TPEX:IX0043']) setOHLC('otc',tv['TPEX:IX0043']);
+    if(tv['TAIFEX:TXF1!']){if(curSess==='早盤')setOHLC('p',tv['TAIFEX:TXF1!'],true);else setOHLC('f',tv['TAIFEX:TXF1!'],true);}
+    msgs.push('<span class="ok">✓ TradingView（費半/加權/櫃加）</span>');
+  } catch(e){msgs.push('<span class="err">✗ TradingView: '+e.message+'</span>');}
+  try {
+    const r=await fetch('https://mis.taifex.com.tw/futures/api/getQuoteList',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({MarketType:0,SymbolType:2})});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    const near=(j?.RtData?.QuoteList||[]).find(q=>q.SymbolID&&/^TXF\d{6}$/.test(q.SymbolID));
+    if(near){setOHLC('n',{o:near.OpeningPrice,h:near.HighestPrice,l:near.LowestPrice,c:near.LastPrice},true);msgs.push('<span class="ok">✓ 台指近</span>');}
+    else msgs.push('<span class="err">✗ 台指近：找不到（手動輸入）</span>');
+  } catch(e){msgs.push('<span class="err">✗ 期交所: '+e.message+'（手動輸入）</span>');}
+  try {
+    const r=await fetch('https://mis.taifex.com.tw/futures/api/getQuoteListVIX',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    const v=j?.RtData?.QuoteList?.[0]?.LastPrice;
+    if(v){document.getElementById('s-vix').value=parseFloat(v).toFixed(2);msgs.push('<span class="ok">✓ VIX</span>');}
+    else throw new Error('無數據');
+  } catch(e){msgs.push('<span class="err">✗ VIX: '+e.message+'（手動輸入）</span>');}
+  refreshStates();
+  log.innerHTML=msgs.join('<br>');
+}
+
+// ══════════════════════════════════════════
+// SEED DATA
+// ══════════════════════════════════════════
+const SEED=[{"date":"2026-06-26","session":"午盤","ts":1751000400000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13419,"h":13520,"l":13159,"c":13204,"state":"維持多","r":13649,"s":12929},"tai":{"o":46189,"h":46189,"l":44454,"c":44572,"state":"突破空","r":46852,"s":43791},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-25","session":"午盤","ts":1750914000000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":14156,"h":14195,"l":13380,"c":13941,"state":"突破多","r":14511,"s":13064},"tai":{"o":46340,"h":46785,"l":46049,"c":46255,"state":"維持空","r":47086,"s":45748},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-24","session":"午盤","ts":1750827600000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13484,"h":13597,"l":13116,"c":13458,"state":"維持空","r":13781,"s":12932},"tai":{"o":46910,"h":46910,"l":45820,"c":46044,"state":"突破空","r":47326,"s":45404},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-23","session":"午盤","ts":1750741200000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13586,"h":13857,"l":13374,"c":13483,"state":"突破空","r":14041,"s":13190},"tai":{"o":47795,"h":48219,"l":47101,"c":47101,"state":"維持多","r":48646,"s":46674},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-22","session":"午盤","ts":1750568400000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":14607,"h":14655,"l":14394,"c":14635,"state":"突破多","r":14755,"s":14294},"tai":{"o":46680,"h":47871,"l":46680,"c":47742,"state":"突破多","r":48326,"s":46225},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-18","session":"午盤","ts":1750222800000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":14085,"h":14462,"l":14062,"c":14342,"state":"突破多","r":14606,"s":13918},"tai":{"o":45972,"h":46566,"l":45972,"c":46465,"state":"突破多","r":46793,"s":45745},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-17","session":"午盤","ts":1750136400000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13694,"h":13966,"l":13471,"c":13477,"state":"維持空","r":14052,"s":13385},"tai":{"o":45685,"h":45877,"l":45160,"c":45877,"state":"維持多","r":46151,"s":44886},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-16","session":"午盤","ts":1750050000000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13968,"h":14134,"l":13292,"c":13294,"state":"突破空","r":14449,"s":12977},"tai":{"o":45500,"h":45809,"l":45266,"c":45809,"state":"維持多","r":46020,"s":45055},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-15","session":"午盤","ts":1749963600000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13901,"h":14135,"l":13860,"c":14100,"state":"突破多","r":14241,"s":13754},"tai":{"o":44448,"h":45484,"l":44448,"c":45397,"state":"突破多","r":45881,"s":44051},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-12","session":"午盤","ts":1749704400000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13054,"h":13513,"l":12986,"c":13371,"state":"維持多","r":13722,"s":12777},"tai":{"o":43588,"h":44799,"l":43588,"c":44169,"state":"突破多","r":45261,"s":43126},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-11","session":"午盤","ts":1749618000000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":12507,"h":13194,"l":12475,"c":13171,"state":"突破多","r":13461,"s":12208},"tai":{"o":43172,"h":43463,"l":42006,"c":43149,"state":"維持空","r":43992,"s":41477},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-10","session":"午盤","ts":1749531600000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":12502,"h":12871,"l":12158,"c":12206,"state":"維持空","r":13012,"s":12017},"tai":{"o":44581,"h":44676,"l":43226,"c":43226,"state":"突破空","r":45230,"s":42672},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-09","session":"午盤","ts":1749445200000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13143,"h":13264,"l":11794,"c":12658,"state":"維持空","r":13829,"s":11229},"tai":{"o":43688,"h":44822,"l":43688,"c":44704,"state":"維持空","r":45253,"s":43257},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-08","session":"午盤","ts":1749358800000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":12839,"h":13129,"l":12677,"c":12907,"state":"維持空","r":13240,"s":12566},"tai":{"o":44507,"h":44507,"l":42377,"c":43503,"state":"突破空","r":45321,"s":41563},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-05","session":"午盤","ts":1749099600000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13063,"h":13111,"l":12217,"c":12221,"state":"突破空","r":13433,"s":11895},"tai":{"o":45620,"h":45620,"l":44210,"c":45071,"state":"突破空","r":46159,"s":43671},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-04","session":"午盤","ts":1749013200000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13244,"h":13820,"l":13041,"c":13618,"state":"維持多","r":14049,"s":12812},"tai":{"o":46364,"h":46364,"l":45677,"c":45677,"state":"維持多","r":46626,"s":45415},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-03","session":"午盤","ts":1748926800000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13971,"h":13998,"l":13554,"c":13917,"state":"維持多","r":14157,"s":13395},"tai":{"o":45660,"h":46552,"l":45660,"c":46459,"state":"突破多","r":46893,"s":45319},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-02","session":"午盤","ts":1748840400000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":13243,"h":13734,"l":13202,"c":13726,"state":"突破多","r":13919,"s":13017},"tai":{"o":45389,"h":45916,"l":44869,"c":45557,"state":"維持多","r":46330,"s":44455},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}},{"date":"2026-06-01","session":"午盤","ts":1748754000000,"n":{"o":null,"h":null,"l":null,"c":null},"f":{"o":null,"h":null,"l":null,"c":null},"p":{"o":null,"h":null,"l":null,"c":null},"sox":{"o":12707,"h":13088,"l":12631,"c":12966,"state":"維持多","r":13233,"s":12486},"tai":{"o":44873,"h":45931,"l":44873,"c":45338,"state":"維持多","r":46358,"s":43846},"otc":{"o":null,"h":null,"l":null,"c":null,"state":null,"r":null,"s":null},"sent":{"premium":null,"vix":null,"fl":0,"fs":0,"fnet":0}}];
+
+const SEED_STH={"2026-05-29":{"tai":{"c":45338,"r":46358,"s":43846,"state":"維持多"},"sox":{"c":12966,"r":13233,"s":12486,"state":"維持多"}},"2026-06-01":{"tai":{"c":45338,"r":46358,"s":43846,"state":"維持多"},"sox":{"c":12966,"r":13233,"s":12486,"state":"維持多"}},"2026-06-02":{"tai":{"c":45557,"r":46330,"s":44455,"state":"維持多"},"sox":{"c":13726,"r":13919,"s":13017,"state":"突破多"}},"2026-06-03":{"tai":{"c":46459,"r":46893,"s":45319,"state":"突破多"},"sox":{"c":13917,"r":14157,"s":13395,"state":"維持多"}},"2026-06-04":{"tai":{"c":45677,"r":46626,"s":45415,"state":"維持多"},"sox":{"c":13618,"r":14049,"s":12812,"state":"維持多"}},"2026-06-05":{"tai":{"c":45071,"r":46159,"s":43671,"state":"突破空"},"sox":{"c":12221,"r":13433,"s":11895,"state":"突破空"}},"2026-06-08":{"tai":{"c":43503,"r":45321,"s":41563,"state":"突破空"},"sox":{"c":12907,"r":13240,"s":12566,"state":"維持空"}},"2026-06-09":{"tai":{"c":44704,"r":45253,"s":43257,"state":"維持空"},"sox":{"c":12658,"r":13829,"s":11229,"state":"維持空"}},"2026-06-10":{"tai":{"c":43226,"r":45230,"s":42672,"state":"突破空"},"sox":{"c":12206,"r":13012,"s":12017,"state":"維持空"}},"2026-06-11":{"tai":{"c":43149,"r":43992,"s":41477,"state":"維持空"},"sox":{"c":13171,"r":13461,"s":12208,"state":"突破多"}},"2026-06-12":{"tai":{"c":44169,"r":45261,"s":43126,"state":"突破多"},"sox":{"c":13371,"r":13722,"s":12777,"state":"維持多"}},"2026-06-15":{"tai":{"c":45397,"r":45881,"s":44051,"state":"突破多"},"sox":{"c":14100,"r":14241,"s":13754,"state":"突破多"}},"2026-06-16":{"tai":{"c":45809,"r":46020,"s":45055,"state":"維持多"},"sox":{"c":13294,"r":14449,"s":12977,"state":"突破空"}},"2026-06-17":{"tai":{"c":45877,"r":46151,"s":44886,"state":"維持多"},"sox":{"c":13477,"r":14052,"s":13385,"state":"維持空"}},"2026-06-18":{"tai":{"c":46465,"r":46793,"s":45745,"state":"突破多"},"sox":{"c":14342,"r":14606,"s":13918,"state":"突破多"}},"2026-06-22":{"tai":{"c":47742,"r":48326,"s":46225,"state":"突破多"},"sox":{"c":14635,"r":14755,"s":14294,"state":"突破多"}},"2026-06-23":{"tai":{"c":47101,"r":48646,"s":46674,"state":"維持多"},"sox":{"c":13483,"r":14041,"s":13190,"state":"突破空"}},"2026-06-24":{"tai":{"c":46044,"r":47326,"s":45404,"state":"突破空"},"sox":{"c":13458,"r":13781,"s":12932,"state":"維持空"}},"2026-06-25":{"tai":{"c":46255,"r":47086,"s":45748,"state":"維持空"},"sox":{"c":13941,"r":14511,"s":13064,"state":"突破多"}},"2026-06-26":{"tai":{"c":44572,"r":46852,"s":43791,"state":"突破空"},"sox":{"c":13204,"r":13649,"s":12929,"state":"維持多"}}};
+
+function importSeed() {
+  const exist = new Set(recs.map(r=>r.date+r.session));
+  let added=0;
+  SEED.forEach(r=>{ if(!exist.has(r.date+r.session)){recs.push(r);added++;} });
+  Object.assign(sth, SEED_STH);
+  recs.sort((a,b) => b.date.localeCompare(a.date) || (b.session==='午盤'?1:0)-(a.session==='午盤'?1:0));
+  save(); renderHist(); updateHistSel();
+  if(recs.length) renderTab2(recs[0]);
+  alert(`已匯入 ${added} 筆六月份資料\n（加權+費半真實數據，台指期/OTC欄位需自行補充）`);
+}
+
+// ══════════════════════════════════════════
+// TAB SWITCH
+// ══════════════════════════════════════════
+function switchTab(i) {
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',i===j));
+  document.querySelectorAll('.pane').forEach((p,j)=>p.classList.toggle('active',i===j));
+  if(i===1) loadSentRef();
+  if(i===2) { renderPrices(); updateHistSel(); }
+}
+
+// ══════════════════════════════════════════
+// AUTO ADVANCE ON ENTER
+// ══════════════════════════════════════════
+const FIELD_ORDER = [
+  'n-o','n-h','n-l','n-c',
+  'f-o','f-h','f-l','f-c',
+  'p-o','p-h','p-l','p-c',
+  'sox-o','sox-h','sox-l','sox-c',
+  'tai-o','tai-h','tai-l','tai-c',
+  'otc-o','otc-h','otc-l','otc-c',
+  's-fnet-in','s-evap','s-vix'
+];
+
+// 輸入幾位數字後自動跳下一格（不含小數點和負號）
+const FIELD_DIGITS = {
+  'n-o':5,'n-h':5,'n-l':5,'n-c':5,
+  'f-o':5,'f-h':5,'f-l':5,'f-c':5,
+  'p-o':5,'p-h':5,'p-l':5,'p-c':5,
+  'sox-o':5,'sox-h':5,'sox-l':5,'sox-c':5,
+  'tai-o':5,'tai-h':5,'tai-l':5,'tai-c':5,
+  'otc-o':4,'otc-h':4,'otc-l':4,'otc-c':4,
+};
+
+function focusNext(idx) {
+  for (let i = idx + 1; i < FIELD_ORDER.length; i++) {
+    const next = document.getElementById(FIELD_ORDER[i]);
+    if (next && !next.readOnly) { next.focus(); next.select(); return; }
+  }
+}
+
+function setupAutoAdvance() {
+  FIELD_ORDER.forEach((id, idx) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('enterkeyhint', 'next');
+
+    // 自動跳：達到位數上限時
+    const threshold = FIELD_DIGITS[id];
+    if (threshold) {
+      el.addEventListener('input', () => {
+        if (el.readOnly) return;
+        const digits = el.value.replace(/[^0-9]/g, '').length;
+        if (digits >= threshold) setTimeout(() => focusNext(idx), 0);
+      });
+    }
+
+    // Enter 也可以跳
+    el.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      focusNext(idx);
+    });
+  });
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+load();
+
+// Set today's date in picker
+document.getElementById('work-date').value = today();
+updateDateDisp();
+
+setupAutoAdvance();
+renderHist();
+updateHistSel();
+if(recs.length) renderTab2(recs[0]);
+
+// Auto session by time
+const hr=new Date().getHours();
+if(hr>=14&&hr<24) { curSess='午盤'; document.getElementById('sb0').classList.remove('active'); document.getElementById('sb1').classList.add('active'); }
+prefillForm(curSess);
+</script>
+<script>
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>

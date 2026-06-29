@@ -1,0 +1,13 @@
+{
+  "name": "台指期盤前規劃",
+  "short_name": "盤前規劃",
+  "description": "台指期盤前規劃系統",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0f13",
+  "theme_color": "#0f0f13",
+  "icons": [
+    { "src": "/pq-icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

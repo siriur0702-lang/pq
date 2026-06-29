@@ -218,10 +218,17 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <div class="ig"><span class="lbl">台指 VIX</span><input type="number" step=".01" id="s-vix" placeholder="如 18.5" oninput="calcSent()"></div>
       <div class="ig"></div>
     </div>
+    <div style="margin-top:8px" class="row2">
+      <div class="ig"><span class="lbl">台指期貨量（億）</span><input type="number" step="0.01" id="s-fvol" placeholder="如 35.2" oninput="calcSent()"></div>
+      <div class="ig"><span class="lbl">加權成交量（億）</span><input type="number" step="0.01" id="s-tvol" placeholder="如 3500" oninput="calcSent()"></div>
+    </div>
     <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-height:22px">
       <div id="sc-premium" style="font-size:15px;font-weight:700;color:#aaa">—</div>
       <div id="sc-contra-short" style="font-size:13px"></div>
       <div id="sc-vix-short" style="font-size:13px;color:#aaa"></div>
+    </div>
+    <div style="margin-top:6px;min-height:20px">
+      <div id="sc-vol" style="font-size:13px;color:#aaa"></div>
     </div>
     <div id="sc-warn" style="display:none;margin-top:8px;padding:9px;background:rgba(255,82,82,.1);border-radius:7px;font-size:12px;color:#ff7070;border-left:3px solid #ff5252;line-height:1.7"></div>
     <button class="btn btn-green" style="margin-top:10px" onclick="saveSent()">✓ 儲存情緒數據</button>
@@ -241,6 +248,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             <th style="padding:5px 4px;text-align:right;font-weight:500">正逆差</th>
             <th style="padding:5px 4px;text-align:right;font-weight:500">差變化</th>
             <th style="padding:5px 4px;text-align:right;font-weight:500">VIX</th>
+            <th style="padding:5px 4px;text-align:center;font-weight:500">量能</th>
             <th style="padding:5px 6px;text-align:center;font-weight:500">訊號</th>
           </tr>
         </thead>
@@ -878,6 +886,8 @@ function clearSentInputs() {
   const p=document.getElementById('sc-premium'); if(p){p.textContent='—';p.style.color='#aaa';}
   const c=document.getElementById('sc-contra-short'); if(c) c.textContent='';
   const v=document.getElementById('sc-vix-short'); if(v) v.textContent='';
+  const vol=document.getElementById('sc-vol'); if(vol) vol.textContent='';
+  ['s-fvol','s-tvol'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   window._sentCalc = null;
 }
 
@@ -888,6 +898,8 @@ function loadSentRef() {
     if(todaySent.fnet!=null) document.getElementById('s-fnet-in').value = todaySent.fnet;
     if(todaySent.evaporation!=null) document.getElementById('s-evap').value = todaySent.evaporation;
     if(todaySent.vix) document.getElementById('s-vix').value = todaySent.vix;
+    if(todaySent.fvol!=null) document.getElementById('s-fvol').value = todaySent.fvol;
+    if(todaySent.tvol!=null) document.getElementById('s-tvol').value = todaySent.tvol;
     calcSent();
   }
   renderSentTable();
@@ -948,22 +960,50 @@ function calcSent() {
   const wEl=document.getElementById('sc-warn');
   if(warns.length){wEl.style.display='block';wEl.innerHTML=warns.join('<br>');}else wEl.style.display='none';
 
+  // 量能判斷
+  const fvol = getVal('s-fvol');
+  const tvol = getVal('s-tvol');
+  const volEl = document.getElementById('sc-vol');
+  let volJudge = null;
+  if(fvol!=null && tvol!=null) {
+    const prevSentRec = getLatestRec(null, t, '午盤') || getLatestRec(null, t, '早盤');
+    const prevFvol = prevSentRec?.sent?.fvol ?? null;
+    const prevTvol = prevSentRec?.sent?.tvol ?? null;
+    if(prevFvol!=null && prevTvol!=null) {
+      const fInc = fvol > prevFvol;
+      const tInc = tvol > prevTvol;
+      if(fInc && tInc)       volJudge = '趨勢推';
+      else if(!fInc && !tInc) volJudge = '觀望盤';
+      else                    volJudge = '震盪盤';
+      const fArrow = fInc ? '↑' : '↓';
+      const tArrow = tInc ? '↑' : '↓';
+      const col = volJudge==='趨勢推'?'#ff9800':volJudge==='觀望盤'?'#555':'#4fc3f7';
+      volEl.innerHTML = `台指期 ${fArrow} ｜ 加權 ${tArrow} → <span style="color:${col};font-weight:600">${volJudge}</span>`;
+    } else {
+      volEl.textContent = '量能：無前日資料可比對';
+      volEl.style.color = '#555';
+    }
+  } else { volEl.textContent = ''; }
+
   window._sentCalc = {
     fnet: fnet??null, evaporation:evap, vix,
     premium, premiumStatus:premium!=null?(premium>0?'正價差':'逆價差'):null,
     premiumChange:premChg!=null?Math.round(premChg):null,
     premiumSwitch:switched, hasContradiction:hasCont,
-    contradictionCount:count
+    contradictionCount:count,
+    fvol: fvol??null, tvol: tvol??null, volJudge
   };
 }
 
 // 計算單筆 record 的情緒數值（供表格用）
-function calcSentForRec(rec, prevPremium, prevCount) {
+function calcSentForRec(rec, prevPremium, prevCount, prevRec) {
   const txfC = rec.n?.c || rec.f?.c || rec.p?.c;
   const taiC = rec.tai?.c;
   const evap = rec.sent?.evaporation || 0;
   const fnet = rec.sent?.fnet ?? null;
   const vix  = rec.sent?.vix  ?? null;
+  const fvol = rec.sent?.fvol ?? null;
+  const tvol = rec.sent?.tvol ?? null;
   const premium = (txfC&&taiC) ? Math.round(txfC-taiC+evap) : null;
   const premChange = (premium!=null&&prevPremium!=null) ? premium-prevPremium : null;
   const switched = (premium!=null&&prevPremium!=null) ? (premium>0)!==(prevPremium>0) : false;
@@ -973,7 +1013,16 @@ function calcSentForRec(rec, prevPremium, prevCount) {
   }
   const base = switched ? 0 : (prevCount||0);
   const count = hasCont ? base+1 : base;
-  return {txfC,taiC,fnet,vix,premium,premChange,switched,hasCont,count};
+  // 量能判斷
+  let volJudge = null;
+  if(fvol!=null && tvol!=null && prevRec) {
+    const pf = prevRec.sent?.fvol ?? null, pt = prevRec.sent?.tvol ?? null;
+    if(pf!=null && pt!=null) {
+      const fInc=fvol>pf, tInc=tvol>pt;
+      volJudge = (fInc&&tInc)?'趨勢推':(!fInc&&!tInc)?'觀望盤':'震盪盤';
+    }
+  }
+  return {txfC,taiC,fnet,vix,premium,premChange,switched,hasCont,count,volJudge};
 }
 
 function renderSentTable() {
@@ -984,17 +1033,19 @@ function renderSentTable() {
   [...recs].sort((a,b)=>a.date.localeCompare(b.date)||(a.session==='午盤'?1:-1))
     .forEach(r => { if(r.n?.c||r.f?.c||r.p?.c) byDate[r.date]=r; });
   const dates = Object.keys(byDate).sort();
-  let prevPrem = null, prevCount = 0;
+  let prevPrem = null, prevCount = 0, prevRec2 = null;
   const rows = dates.map(date => {
     const rec = byDate[date];
-    const {txfC,taiC,fnet,vix,premium,premChange,switched,hasCont,count} = calcSentForRec(rec, prevPrem, prevCount);
+    const {txfC,taiC,fnet,vix,premium,premChange,switched,hasCont,count,volJudge} = calcSentForRec(rec, prevPrem, prevCount, prevRec2);
     if(premium!=null) prevPrem=premium;
     prevCount = count;
+    prevRec2 = rec;
     const ds = date.slice(5).replace('-','/');
     const pCol = premium>0?'#ff5252':premium<0?'#4fc3f7':'#aaa';
     const cCol = premChange>0?'#ff5252':premChange<0?'#69f0ae':'#aaa';
     const vCol = vix>25?'#ff5252':vix>20?'#ffb74d':'#69f0ae';
     const fCol = fnet>0?'#ff5252':fnet<0?'#69f0ae':'#aaa';
+    const vJCol = volJudge==='趨勢推'?'#ff9800':volJudge==='觀望盤'?'#555':'#4fc3f7';
     let sig='';
     if(hasCont) sig+=`<span style="color:#ff9800;font-size:10px">矛${count}</span>`;
     if(switched) sig+=`<span style="color:#4fc3f7;font-size:10px${hasCont?' margin-left:2px':''}">轉</span>`;
@@ -1008,6 +1059,7 @@ function renderSentTable() {
       <td style="padding:5px 4px;text-align:right;color:${pCol};font-weight:600">${premium!=null?(premium>0?'+':'')+premium:'—'}</td>
       <td style="padding:5px 4px;text-align:right;color:${cCol}">${premChange!=null?(premChange>0?'+':'')+premChange:'—'}</td>
       <td style="padding:5px 4px;text-align:right;color:${vCol}">${vix||'—'}</td>
+      <td style="padding:5px 4px;text-align:center;color:${vJCol};font-size:10px">${volJudge||'—'}</td>
       <td style="padding:5px 6px;text-align:center">${sig}</td>
     </tr>`;
   });

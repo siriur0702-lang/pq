@@ -182,7 +182,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="sec-hdr">
       <h3>歷史記錄</h3>
       <div style="display:flex;gap:12px">
-        <span class="sec-act" onclick="importSeed()">匯入六月</span>
+        <span class="sec-act" onclick="exportData()">📤 匯出</span>
+        <span class="sec-act" onclick="importData()">📥 匯入</span>
         <span class="sec-act" style="color:#ff5252" onclick="doClear()">清除</span>
       </div>
     </div>
@@ -805,6 +806,28 @@ function loadHistRec() {
 
 function doClear() {
   if(confirm('清除所有歷史記錄？')) { recs=[]; sth={}; save(); renderHist(); updateHistSel(); }
+}
+
+function exportData() {
+  const data = JSON.stringify({ recs, sth });
+  const encoded = btoa(unescape(encodeURIComponent(data)));
+  prompt('複製這串文字，到新裝置點「匯入」貼上：', encoded);
+}
+
+function importData() {
+  const encoded = prompt('貼上匯出的文字：');
+  if(!encoded) return;
+  try {
+    const data = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    if(!data.recs || !data.sth) throw new Error();
+    recs = data.recs;
+    sth = data.sth;
+    save(); renderHist(); updateHistSel();
+    if(recs.length) renderTab2(recs[0]);
+    alert('匯入成功！共 '+recs.length+' 筆記錄');
+  } catch(e) {
+    alert('匯入失敗，文字可能有誤');
+  }
 }
 
 // ══════════════════════════════════════════

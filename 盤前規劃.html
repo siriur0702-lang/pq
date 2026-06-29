@@ -182,12 +182,26 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <div class="sec-hdr">
       <h3>歷史記錄</h3>
       <div style="display:flex;gap:12px">
-        <span class="sec-act" onclick="exportData()">📤 匯出</span>
-        <span class="sec-act" onclick="importData()">📥 匯入</span>
+        <span class="sec-act" onclick="showTransfer('export')">📤 匯出</span>
+        <span class="sec-act" onclick="showTransfer('import')">📥 匯入</span>
         <span class="sec-act" style="color:#ff5252" onclick="doClear()">清除</span>
       </div>
     </div>
     <div id="hist"></div>
+  </div>
+</div>
+
+<!-- 匯出/匯入面板 -->
+<div id="transfer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300" onclick="closeTransfer()"></div>
+<div id="transfer-panel" style="display:none;position:fixed;left:12px;right:12px;bottom:0;background:#1a1a24;border-radius:14px 14px 0 0;padding:20px;z-index:301">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h3 id="transfer-title">匯出</h3>
+    <span style="color:#555;font-size:22px;cursor:pointer" onclick="closeTransfer()">✕</span>
+  </div>
+  <textarea id="transfer-ta" style="width:100%;height:160px;background:#0f0f13;border:1px solid #252532;border-radius:8px;color:#e0e0e0;font-size:12px;padding:10px;resize:none;font-family:monospace" placeholder="匯入時在此貼上文字"></textarea>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button id="transfer-btn" class="btn btn-green" style="margin:0" onclick="doTransfer()">複製</button>
+    <button class="btn btn-gray" style="margin:0" onclick="closeTransfer()">取消</button>
   </div>
 </div>
 
@@ -808,25 +822,49 @@ function doClear() {
   if(confirm('清除所有歷史記錄？')) { recs=[]; sth={}; save(); renderHist(); updateHistSel(); }
 }
 
-function exportData() {
-  const data = JSON.stringify({ recs, sth });
-  const encoded = btoa(unescape(encodeURIComponent(data)));
-  prompt('複製這串文字，到新裝置點「匯入」貼上：', encoded);
+let _transferMode = 'export';
+function showTransfer(mode) {
+  _transferMode = mode;
+  const ta = document.getElementById('transfer-ta');
+  const btn = document.getElementById('transfer-btn');
+  document.getElementById('transfer-title').textContent = mode==='export' ? '📤 匯出資料' : '📥 匯入資料';
+  if(mode==='export') {
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify({recs,sth}))));
+    ta.value = encoded;
+    ta.readOnly = true;
+    btn.textContent = '全選並複製';
+  } else {
+    ta.value = '';
+    ta.readOnly = false;
+    ta.placeholder = '貼上從電腦匯出的文字';
+    btn.textContent = '確認匯入';
+  }
+  document.getElementById('transfer-overlay').style.display='block';
+  document.getElementById('transfer-panel').style.display='block';
+  if(mode==='export') { ta.select(); }
 }
-
-function importData() {
-  const encoded = prompt('貼上匯出的文字：');
-  if(!encoded) return;
-  try {
-    const data = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    if(!data.recs || !data.sth) throw new Error();
-    recs = data.recs;
-    sth = data.sth;
-    save(); renderHist(); updateHistSel();
-    if(recs.length) renderTab2(recs[0]);
-    alert('匯入成功！共 '+recs.length+' 筆記錄');
-  } catch(e) {
-    alert('匯入失敗，文字可能有誤');
+function closeTransfer() {
+  document.getElementById('transfer-overlay').style.display='none';
+  document.getElementById('transfer-panel').style.display='none';
+}
+function doTransfer() {
+  if(_transferMode==='export') {
+    const ta = document.getElementById('transfer-ta');
+    ta.select(); document.execCommand('copy');
+    document.getElementById('transfer-btn').textContent='✓ 已複製！';
+    setTimeout(()=>{ document.getElementById('transfer-btn').textContent='全選並複製'; },2000);
+  } else {
+    const encoded = document.getElementById('transfer-ta').value.trim();
+    if(!encoded) return;
+    try {
+      const data = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+      if(!data.recs||!data.sth) throw new Error();
+      recs=data.recs; sth=data.sth;
+      save(); renderHist(); updateHistSel();
+      if(recs.length) renderTab2(recs[0]);
+      closeTransfer();
+      alert('匯入成功！共 '+recs.length+' 筆記錄');
+    } catch(e) { alert('匯入失敗，請確認文字是否完整'); }
   }
 }
 

@@ -471,8 +471,25 @@ function saveSyncKey() {
   const val = document.getElementById('sync-key-inp').value.trim();
   syncKey = val;
   localStorage.setItem('txf_sync_key', syncKey);
-  if (syncKey) startFirebaseSync();
-  else { if (fbUnsubscribe) { fbUnsubscribe(); fbUnsubscribe = null; } setSyncStatus('none'); }
+  if (syncKey) {
+    // 先把本機現有資料上傳，再開始監聽
+    if (fbDb && recs.length > 0) {
+      setSyncStatus('saving');
+      fbDb.ref('data/' + syncKey).once('value').then(snap => {
+        const remote = snap.val();
+        // 若雲端沒資料，或本機資料比較多，就上傳本機
+        if (!remote || !remote.recs || remote.recs.length < recs.length) {
+          return fbDb.ref('data/' + syncKey).set({ recs, sth });
+        }
+      }).then(() => startFirebaseSync())
+        .catch(() => startFirebaseSync());
+    } else {
+      startFirebaseSync();
+    }
+  } else {
+    if (fbUnsubscribe) { fbUnsubscribe(); fbUnsubscribe = null; }
+    setSyncStatus('none');
+  }
   closeSyncSettings();
 }
 

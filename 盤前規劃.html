@@ -149,8 +149,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <div class="ig"><span class="lbl">低</span><input type="number" step=".01" id="sox-l"></div>
       <div class="ig"><span class="lbl">收</span><input type="number" step=".01" id="sox-c"></div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
       <span class="lbl">多空：</span><span id="sox-st" class="badge b-none" onclick="openStatePicker('sox',this)" style="cursor:pointer" title="點擊修改">—</span>
+      <button onclick="inheritPrevState('sox')" style="font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid #333;background:#131318;color:#777;cursor:pointer;touch-action:manipulation">沿用前日</button>
     </div>
     <div class="dvd"></div>
     <div class="sub">加權（TAIEX）</div>
@@ -660,7 +661,16 @@ function refreshStates() {
   ['sox','tai','otc'].forEach(sym => {
     const c = getVal(sym+'-c');
     const el = document.getElementById(sym+'-st');
-    if(!c) { el.textContent='—'; el.className='badge b-none'; return; }
+    if(!c) {
+      const manualSt = sth[t]?.[sym];
+      if(manualSt?.manual && manualSt?.state) {
+        el.textContent = manualSt.state;
+        el.className = 'badge b-' + manualSt.state;
+      } else {
+        el.textContent='—'; el.className='badge b-none';
+      }
+      return;
+    }
 
     const todaySth = sth[t]?.[sym];
     const isLocked = !!document.getElementById(sym+'-c')?.readOnly;
@@ -730,6 +740,23 @@ function checkInitStates() {
           </button>`).join('')}
       </div>
     </div>`).join('');
+}
+
+function inheritPrevState(sym) {
+  const t = getWorkDate();
+  let prevState = null;
+  const dates = Object.keys(sth).filter(d => d < t).sort().reverse();
+  for (const d of dates) { if(sth[d]?.[sym]?.state) { prevState = sth[d][sym].state; break; } }
+  if (!prevState) {
+    const pr = recs.filter(r => r.date < t && r[sym]?.state)
+      .sort((a,b) => b.date.localeCompare(a.date))[0];
+    if(pr) prevState = pr[sym].state;
+  }
+  if (!prevState) { alert('找不到前日狀態，請手動點擊設定'); return; }
+  if (!sth[t]) sth[t] = {};
+  sth[t][sym] = { c: null, r: null, s: null, state: prevState, manual: true };
+  save();
+  refreshStates();
 }
 
 function setInitState(sym, st) {

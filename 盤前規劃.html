@@ -153,6 +153,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <span class="lbl">多空：</span><span id="sox-st" class="badge b-none" onclick="openStatePicker('sox',this)" style="cursor:pointer" title="點擊修改">—</span>
       <button onclick="inheritPrevState('sox')" style="font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid #333;background:#131318;color:#777;cursor:pointer;touch-action:manipulation">沿用前日</button>
     </div>
+    <div id="sox-inherit-info" style="display:none;font-size:11px;color:#555;margin-top:3px;line-height:1.6"></div>
     <div class="dvd"></div>
     <div class="sub">加權（TAIEX）</div>
     <div class="row4">
@@ -666,11 +667,25 @@ function refreshStates() {
       if(manualSt?.manual && manualSt?.state) {
         el.textContent = manualSt.state;
         el.className = 'badge b-' + manualSt.state;
+        if(sym === 'sox') {
+          const info = document.getElementById('sox-inherit-info');
+          if(info) {
+            const fd = manualSt.fromDate;
+            const fdStr = fd ? fd.slice(5).replace('-','/') : '前日';
+            const rStr = manualSt.r != null ? manualSt.r : '—';
+            const sStr = manualSt.s != null ? manualSt.s : '—';
+            info.style.display = 'block';
+            info.textContent = `← 沿用 ${fdStr}｜R:${rStr} S:${sStr}`;
+          }
+        }
       } else {
         el.textContent='—'; el.className='badge b-none';
+        if(sym === 'sox') { const info = document.getElementById('sox-inherit-info'); if(info) info.style.display='none'; }
       }
       return;
     }
+    // 有數值時隱藏繼承提示
+    if(sym === 'sox') { const info = document.getElementById('sox-inherit-info'); if(info) info.style.display='none'; }
 
     const todaySth = sth[t]?.[sym];
     const isLocked = !!document.getElementById(sym+'-c')?.readOnly;
@@ -744,24 +759,23 @@ function checkInitStates() {
 
 function inheritPrevState(sym) {
   const t = getWorkDate();
-  let prevState = null, prevR = null, prevS = null;
+  let prevState = null, prevR = null, prevS = null, fromDate = null;
   // 找最近一筆有 state 的紀錄，優先找有 r/s 的（實際有資料的那天）
   const dates = Object.keys(sth).filter(d => d < t).sort().reverse();
   for (const d of dates) {
     const e = sth[d]?.[sym];
     if (!e?.state) continue;
-    if (!prevState) prevState = e.state;
-    if (e.r != null && e.s != null) { prevR = e.r; prevS = e.s; break; }
+    if (!prevState) { prevState = e.state; fromDate = d; }
+    if (e.r != null && e.s != null) { prevR = e.r; prevS = e.s; fromDate = d; break; }
   }
   if (!prevState) {
     const pr = recs.filter(r => r.date < t && r[sym]?.state)
       .sort((a,b) => b.date.localeCompare(a.date))[0];
-    if (pr) { prevState = pr[sym].state; prevR = pr[sym].r; prevS = pr[sym].s; }
+    if (pr) { prevState = pr[sym].state; prevR = pr[sym].r; prevS = pr[sym].s; fromDate = pr.date; }
   }
   if (!prevState) { alert('找不到前日狀態，請手動點擊設定'); return; }
   if (!sth[t]) sth[t] = {};
-  // 帶入前日 r/s，讓隔天有真實數據時能正確比對
-  sth[t][sym] = { c: null, r: prevR, s: prevS, state: prevState, manual: true };
+  sth[t][sym] = { c: null, r: prevR, s: prevS, state: prevState, manual: true, fromDate };
   save();
   refreshStates();
   renderHist();

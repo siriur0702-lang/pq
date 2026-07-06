@@ -670,12 +670,15 @@ function refreshStates() {
         if(sym === 'sox') {
           const info = document.getElementById('sox-inherit-info');
           if(info) {
-            const fd = manualSt.fromDate;
-            const fdStr = fd ? fd.slice(5).replace('-','/') : '前日';
-            const rStr = manualSt.r != null ? manualSt.r : '—';
-            const sStr = manualSt.s != null ? manualSt.s : '—';
-            info.style.display = 'block';
-            info.textContent = `← 沿用 ${fdStr}｜R:${rStr} S:${sStr}`;
+            if(manualSt.fromDate) {
+              const fdStr = manualSt.fromDate.slice(5).replace('-','/');
+              const rStr = manualSt.r != null ? manualSt.r : '—';
+              const sStr = manualSt.s != null ? manualSt.s : '—';
+              info.style.display = 'block';
+              info.textContent = `← 沿用 ${fdStr}｜R:${rStr} S:${sStr}`;
+            } else {
+              info.style.display = 'none';
+            }
           }
         }
       } else {

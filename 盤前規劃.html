@@ -79,8 +79,15 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .chip.sel{border-color:#ffb74d;color:#ffb74d;background:rgba(255,183,77,.1)}
 .ana-title{font-size:11px;color:#4fc3f7;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;margin-top:12px}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
 <body>
+<div id="sync-bar" onclick="openSyncSettings()" style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:#13131a;border-bottom:1px solid #1e1e28;cursor:pointer;touch-action:manipulation">
+  <span id="sync-dot" style="font-size:10px;color:#444">●</span>
+  <span id="sync-txt" style="font-size:12px;color:#555">雲端同步：未設定</span>
+  <span style="margin-left:auto;font-size:11px;color:#333">⚙</span>
+</div>
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab(0)">📊 數據</button>
   <button class="tab-btn" onclick="switchTab(1)">📈 市場情緒</button>
@@ -374,6 +381,99 @@ function load() {
 function save() {
   localStorage.setItem(RK, JSON.stringify(recs));
   localStorage.setItem(SK, JSON.stringify(sth));
+  syncToFirebase();
+}
+
+// ══════════════════════════════════════════
+// FIREBASE SYNC
+// ══════════════════════════════════════════
+const FB_CONFIG = {
+  apiKey: "AIzaSyBq86AB4eOjYTYBxB-qn6qmkXn03L6yJHA",
+  authDomain: "txfpq-98fb5.firebaseapp.com",
+  databaseURL: "https://txfpq-98fb5-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "txfpq-98fb5",
+  storageBucket: "txfpq-98fb5.firebasestorage.app",
+  messagingSenderId: "1050043926138",
+  appId: "1:1050043926138:web:9e36cebdc457f72553ddc3"
+};
+
+let fbDb = null, fbUnsubscribe = null, _isFbWriting = false;
+let syncKey = localStorage.getItem('txf_sync_key') || '';
+let _syncTimer = null;
+
+function initFirebase() {
+  try {
+    const app = firebase.initializeApp(FB_CONFIG);
+    fbDb = firebase.database(app);
+    if (syncKey) startFirebaseSync();
+    else setSyncStatus('none');
+  } catch(e) { console.error('Firebase init:', e); }
+}
+
+function startFirebaseSync() {
+  if (!fbDb || !syncKey) return;
+  if (fbUnsubscribe) { fbUnsubscribe(); fbUnsubscribe = null; }
+  setSyncStatus('connecting');
+  const ref = fbDb.ref('data/' + syncKey);
+  fbUnsubscribe = ref.on('value', snap => {
+    const data = snap.val();
+    if (data && (data.recs || data.sth) && !_isFbWriting) {
+      recs = data.recs || [];
+      sth = data.sth || {};
+      localStorage.setItem(RK, JSON.stringify(recs));
+      localStorage.setItem(SK, JSON.stringify(sth));
+      renderHist(); updateHistSel();
+      if (recs.length) renderTab2(recs[0]);
+      renderSentTable();
+    }
+    setSyncStatus('synced');
+  }, () => setSyncStatus('error'));
+}
+
+function syncToFirebase() {
+  if (!fbDb || !syncKey) return;
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(() => {
+    _isFbWriting = true;
+    setSyncStatus('saving');
+    fbDb.ref('data/' + syncKey).set({ recs, sth })
+      .then(() => { setSyncStatus('synced'); setTimeout(() => { _isFbWriting = false; }, 500); })
+      .catch(() => { setSyncStatus('error'); _isFbWriting = false; });
+  }, 600);
+}
+
+function setSyncStatus(status) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-txt');
+  if (!dot || !txt) return;
+  const map = {
+    none:       ['#444', '雲端同步：未設定'],
+    connecting: ['#ffb74d', '雲端同步：連線中...'],
+    synced:     ['#69f0ae', '雲端同步：已同步 ✓'],
+    saving:     ['#4fc3f7', '雲端同步：儲存中...'],
+    error:      ['#ff5252', '雲端同步：失敗，請檢查網路']
+  };
+  const [color, text] = map[status] || map.none;
+  dot.style.color = color;
+  txt.textContent = text;
+}
+
+function openSyncSettings() {
+  document.getElementById('sync-key-inp').value = syncKey;
+  document.getElementById('sync-overlay').style.display = 'block';
+  document.getElementById('sync-panel').style.display = 'block';
+}
+function closeSyncSettings() {
+  document.getElementById('sync-overlay').style.display = 'none';
+  document.getElementById('sync-panel').style.display = 'none';
+}
+function saveSyncKey() {
+  const val = document.getElementById('sync-key-inp').value.trim();
+  syncKey = val;
+  localStorage.setItem('txf_sync_key', syncKey);
+  if (syncKey) startFirebaseSync();
+  else { if (fbUnsubscribe) { fbUnsubscribe(); fbUnsubscribe = null; } setSyncStatus('none'); }
+  closeSyncSettings();
 }
 
 // ══════════════════════════════════════════
@@ -1364,6 +1464,7 @@ function setupAutoAdvance() {
 // INIT
 // ══════════════════════════════════════════
 load();
+initFirebase();
 
 // Set today's date in picker
 document.getElementById('work-date').value = today();
@@ -1379,6 +1480,31 @@ const hr=new Date().getHours();
 if(hr>=14&&hr<24) { curSess='午盤'; document.getElementById('sb0').classList.remove('active'); document.getElementById('sb1').classList.add('active'); }
 prefillForm(curSess);
 </script>
+<!-- 同步設定 Modal -->
+<div id="sync-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500" onclick="closeSyncSettings()"></div>
+<div id="sync-panel" style="display:none;position:fixed;left:12px;right:12px;bottom:0;background:#1a1a24;border-radius:14px 14px 0 0;padding:20px;z-index:501">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <h3>☁️ 雲端同步設定</h3>
+    <span style="color:#555;font-size:24px;cursor:pointer;line-height:1" onclick="closeSyncSettings()">✕</span>
+  </div>
+  <div style="font-size:13px;color:#666;margin-bottom:14px;line-height:1.8">
+    所有裝置輸入<b style="color:#aaa">相同的金鑰</b>，資料就會自動同步。<br>
+    金鑰可以是任何文字，例如你的名字或數字。
+  </div>
+  <div class="ig" style="margin-bottom:14px">
+    <span class="lbl">同步金鑰</span>
+    <input type="text" id="sync-key-inp" placeholder="輸入自訂金鑰（英文數字）" autocomplete="off" style="font-size:16px;letter-spacing:1px">
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-blue" style="margin:0" onclick="saveSyncKey()">✓ 確認</button>
+    <button class="btn btn-gray" style="margin:0" onclick="closeSyncSettings()">取消</button>
+  </div>
+  <div style="margin-top:14px;font-size:11px;color:#333;line-height:1.8">
+    ⚠️ 金鑰就是你的資料識別碼，請勿與他人分享。<br>
+    不設定金鑰則只使用本機儲存。
+  </div>
+</div>
+
 <script>
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(()=>{});

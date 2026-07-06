@@ -757,6 +757,7 @@ function inheritPrevState(sym) {
   sth[t][sym] = { c: null, r: null, s: null, state: prevState, manual: true };
   save();
   refreshStates();
+  renderHist();
 }
 
 function setInitState(sym, st) {
@@ -894,7 +895,7 @@ function renderHist() {
   if(!recs.length) { cont.innerHTML='<div style="color:#444;text-align:center;padding:18px;font-size:13px">尚無記錄</div>'; return; }
   cont.innerHTML = recs.slice(0,40).map((r,i) => {
     const bgs = ['sox','tai','otc'].map(sym => {
-      const st = r[sym]?.state;
+      const st = r[sym]?.state || sth[r.date]?.[sym]?.state;
       return st?`<span class="badge b-${st}" style="font-size:10px;padding:2px 6px">${st}</span>`:'';
     }).join(' ');
     return `<div class="hist-item" onclick="toggleDet(this)">
@@ -939,11 +940,10 @@ function loadRec(e, i) {
   setFieldsLocked(['n','f','p','sox','tai','otc'], false, null);
   // 載入既有記錄時，直接顯示已儲存的狀態，不重算（避免前日資料缺失導致算錯）
   ['sox','tai','otc'].forEach(sym => {
-    const st = r[sym]?.state || null;
+    const st = r[sym]?.state || sth[r.date]?.[sym]?.state || null;
     const el = document.getElementById(sym+'-st');
     el.textContent = st||'—';
     el.className = 'badge '+(st?'b-'+st:'b-none');
-    // 同步 sth manual flag，保護狀態不被後續 refreshStates 覆蓋
     if(st) {
       if(!sth[r.date]) sth[r.date] = {};
       const ex = sth[r.date][sym] || {};

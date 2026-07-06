@@ -216,7 +216,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 <div class="pane" id="tab1">
   <!-- 今日輸入 -->
   <div class="card">
-    <h3>今日情緒輸入</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h3 style="margin-bottom:0">今日情緒輸入</h3>
+      <span id="sent-date-lbl" style="font-size:12px;color:#4fc3f7"></span>
+    </div>
     <div class="row2">
       <div class="ig"><span class="lbl">外資淨口數（多正空負）</span><input type="number" id="s-fnet-in" placeholder="+5000 或 -3000" oninput="calcSent()"></div>
       <div class="ig"><span class="lbl">待蒸發點數</span><input type="number" id="s-evap" placeholder="如 350" oninput="calcSent()"></div>
@@ -1008,8 +1011,19 @@ function clearSentInputs() {
   window._sentCalc = null;
 }
 
+function loadSentRec(date) {
+  document.getElementById('work-date').value = date;
+  onDateChange();
+  document.getElementById('tab1').scrollTop = 0;
+}
+
 function loadSentRef() {
   clearSentInputs();
+  const lbl = document.getElementById('sent-date-lbl');
+  if (lbl) {
+    const wd = getWorkDate();
+    lbl.textContent = wd !== today() ? '（' + wd.slice(5).replace('-', '/') + '）' : '';
+  }
   const todaySent = (getTodayRec('午盤') || getTodayRec('早盤'))?.sent;
   if(todaySent) {
     if(todaySent.fnet!=null) document.getElementById('s-fnet-in').value = todaySent.fnet;
@@ -1168,7 +1182,8 @@ function renderSentTable() {
     if(switched) sig+=`<span style="color:#4fc3f7;font-size:10px${hasCont?' margin-left:2px':''}">轉</span>`;
     if(!hasCont&&!switched&&count>0) sig+=`<span style="color:#555;font-size:10px">${count}</span>`;
     if(!sig) sig='<span style="color:#252532">—</span>';
-    return `<tr style="border-bottom:1px solid #1a1a22">
+    const isActive = date === getWorkDate();
+    return `<tr style="border-bottom:1px solid #1a1a22;cursor:pointer;${isActive?'background:rgba(79,195,247,.07)':''}" onclick="loadSentRec('${date}')" title="點擊載入此日數據">
       <td style="padding:5px 6px;color:#aaa;position:sticky;left:0;background:#1a1a24;z-index:1">${ds}</td>
       <td style="padding:5px 4px;text-align:right;color:#ccc">${txfC?Math.round(txfC).toLocaleString():'—'}</td>
       <td style="padding:5px 4px;text-align:right;color:#777">${taiC?Math.round(taiC).toLocaleString():'—'}</td>

@@ -744,17 +744,24 @@ function checkInitStates() {
 
 function inheritPrevState(sym) {
   const t = getWorkDate();
-  let prevState = null;
+  let prevState = null, prevR = null, prevS = null;
+  // 找最近一筆有 state 的紀錄，優先找有 r/s 的（實際有資料的那天）
   const dates = Object.keys(sth).filter(d => d < t).sort().reverse();
-  for (const d of dates) { if(sth[d]?.[sym]?.state) { prevState = sth[d][sym].state; break; } }
+  for (const d of dates) {
+    const e = sth[d]?.[sym];
+    if (!e?.state) continue;
+    if (!prevState) prevState = e.state;
+    if (e.r != null && e.s != null) { prevR = e.r; prevS = e.s; break; }
+  }
   if (!prevState) {
     const pr = recs.filter(r => r.date < t && r[sym]?.state)
       .sort((a,b) => b.date.localeCompare(a.date))[0];
-    if(pr) prevState = pr[sym].state;
+    if (pr) { prevState = pr[sym].state; prevR = pr[sym].r; prevS = pr[sym].s; }
   }
   if (!prevState) { alert('找不到前日狀態，請手動點擊設定'); return; }
   if (!sth[t]) sth[t] = {};
-  sth[t][sym] = { c: null, r: null, s: null, state: prevState, manual: true };
+  // 帶入前日 r/s，讓隔天有真實數據時能正確比對
+  sth[t][sym] = { c: null, r: prevR, s: prevS, state: prevState, manual: true };
   save();
   refreshStates();
   renderHist();

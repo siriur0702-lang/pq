@@ -258,6 +258,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
             <th style="padding:5px 4px;text-align:right;font-weight:500">正逆差</th>
             <th style="padding:5px 4px;text-align:right;font-weight:500">差變化</th>
             <th style="padding:5px 4px;text-align:right;font-weight:500">VIX</th>
+            <th style="padding:5px 4px;text-align:right;font-weight:500">VIX%</th>
             <th style="padding:5px 4px;text-align:center;font-weight:500">量能</th>
             <th style="padding:5px 6px;text-align:center;font-weight:500">訊號</th>
           </tr>
@@ -1164,11 +1165,13 @@ function renderSentTable() {
   [...recs].sort((a,b)=>a.date.localeCompare(b.date)||(a.session==='午盤'?1:-1))
     .forEach(r => { if(r.n?.c||r.f?.c||r.p?.c) byDate[r.date]=r; });
   const dates = Object.keys(byDate).sort();
-  let prevPrem = null, prevCount = 0, prevRec2 = null;
+  let prevPrem = null, prevCount = 0, prevRec2 = null, prevVix = null;
   const rows = dates.map(date => {
     const rec = byDate[date];
     const {txfC,taiC,fnet,vix,premium,premChange,switched,hasCont,count,volJudge} = calcSentForRec(rec, prevPrem, prevCount, prevRec2);
+    const vixChg = (vix != null && prevVix != null) ? ((vix - prevVix) / prevVix * 100) : null;
     if(premium!=null) prevPrem=premium;
+    if(vix!=null) prevVix=vix;
     prevCount = count;
     prevRec2 = rec;
     const ds = date.slice(5).replace('-','/');
@@ -1191,6 +1194,7 @@ function renderSentTable() {
       <td style="padding:5px 4px;text-align:right;color:${pCol};font-weight:600">${premium!=null?(premium>0?'+':'')+premium:'—'}</td>
       <td style="padding:5px 4px;text-align:right;color:${cCol}">${premChange!=null?(premChange>0?'+':'')+premChange:'—'}</td>
       <td style="padding:5px 4px;text-align:right;color:${vCol}">${vix||'—'}</td>
+      <td style="padding:5px 4px;text-align:right;color:${vixChg==null?'#444':vixChg>0?'#ff5252':'#69f0ae'}">${vixChg==null?'—':(vixChg>0?'+':'')+vixChg.toFixed(1)+'%'}</td>
       <td style="padding:5px 4px;text-align:center;color:${vJCol};font-size:10px">${volJudge||'—'}</td>
       <td style="padding:5px 6px;text-align:center">${sig}</td>
     </tr>`;

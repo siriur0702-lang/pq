@@ -444,6 +444,7 @@ function loadPlans() {
 }
 function savePlans() {
   localStorage.setItem(PK, JSON.stringify(plans));
+  syncToFirebase();
 }
 
 // ══════════════════════════════════════════
@@ -604,14 +605,16 @@ function startFirebaseSync() {
   const ref = fbDb.ref('data/' + syncKey);
   fbUnsubscribe = ref.on('value', snap => {
     const data = snap.val();
-    if (data && (data.recs || data.sth) && !_isFbWriting) {
+    if (data && (data.recs || data.sth || data.plans) && !_isFbWriting) {
       recs = data.recs || [];
       sth = data.sth || {};
+      if (data.plans) { plans = data.plans; localStorage.setItem(PK, JSON.stringify(plans)); }
       localStorage.setItem(RK, JSON.stringify(recs));
       localStorage.setItem(SK, JSON.stringify(sth));
       renderHist(); updateHistSel();
       if (recs.length) renderTab2(recs[0]);
       renderSentTable();
+      renderConfirm();
     }
     setSyncStatus('synced');
   }, () => setSyncStatus('error'));
@@ -623,7 +626,7 @@ function syncToFirebase() {
   _syncTimer = setTimeout(() => {
     _isFbWriting = true;
     setSyncStatus('saving');
-    fbDb.ref('data/' + syncKey).set({ recs, sth })
+    fbDb.ref('data/' + syncKey).set({ recs, sth, plans })
       .then(() => { setSyncStatus('synced'); setTimeout(() => { _isFbWriting = false; }, 500); })
       .catch(() => { setSyncStatus('error'); _isFbWriting = false; });
   }, 600);
@@ -666,7 +669,7 @@ function saveSyncKey() {
         const remote = snap.val();
         // 若雲端沒資料，或本機資料比較多，就上傳本機
         if (!remote || !remote.recs || remote.recs.length < recs.length) {
-          return fbDb.ref('data/' + syncKey).set({ recs, sth });
+          return fbDb.ref('data/' + syncKey).set({ recs, sth, plans });
         }
       }).then(() => startFirebaseSync())
         .catch(() => startFirebaseSync());

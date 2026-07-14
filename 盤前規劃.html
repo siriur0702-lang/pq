@@ -13,61 +13,61 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0f0f13;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh}
 .tab-bar{display:flex;background:#13131a;border-bottom:1px solid #222;position:sticky;top:0;z-index:100}
-.tab-btn{flex:1;padding:12px 2px;font-size:12px;color:#555;background:none;border:none;cursor:pointer;touch-action:manipulation;border-bottom:2px solid transparent}
+.tab-btn{flex:1;padding:12px 2px;font-size:14px;color:#555;background:none;border:none;cursor:pointer;touch-action:manipulation;border-bottom:2px solid transparent}
 .tab-btn.active{color:#4fc3f7;border-bottom-color:#4fc3f7}
 .pane{display:none;padding:12px 12px 90px}
 .pane.active{display:block}
 .card{background:#1a1a24;border-radius:10px;padding:13px;margin-bottom:10px;border:1px solid #252532}
-h3{font-size:14px;font-weight:600;margin-bottom:10px}
-.sub{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin:8px 0 6px}
+h3{font-size:16px;font-weight:600;margin-bottom:10px}
+.sub{font-size:13px;color:#555;text-transform:uppercase;letter-spacing:.6px;margin:8px 0 6px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px}
 .ig{display:flex;flex-direction:column;gap:2px}
-.lbl{font-size:11px;color:#666}
-input,select{width:100%;background:#0f0f13;border:1px solid #252532;border-radius:6px;padding:9px 8px;color:#e0e0e0;font-size:14px;touch-action:manipulation;-webkit-appearance:none}
+.lbl{font-size:13px;color:#666}
+input,select{width:100%;background:#0f0f13;border:1px solid #252532;border-radius:6px;padding:9px 8px;color:#e0e0e0;font-size:15px;touch-action:manipulation;-webkit-appearance:none}
 input:focus,select:focus{outline:none;border-color:#4fc3f7}
 input.locked{background:#0a0a10;color:#555;border-color:#1a1a22}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath fill='%23555' d='M5 7L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px}
-.lock-tag{font-size:10px;color:#444;padding:1px 5px;background:#131318;border:1px solid #1e1e28;border-radius:3px;margin-top:2px;display:inline-block}
-.btn{display:block;width:100%;padding:13px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;margin-bottom:8px}
+.lock-tag{font-size:12px;color:#444;padding:2px 6px;background:#131318;border:1px solid #1e1e28;border-radius:3px;margin-top:3px;display:inline-block}
+.btn{display:block;width:100%;padding:13px;border-radius:8px;border:none;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation;margin-bottom:8px}
 .btn-blue{background:#4fc3f7;color:#000}
 .btn-green{background:#69f0ae;color:#000}
 .btn-gray{background:#1e1e2a;color:#aaa;border:1px solid #2a2a38}
 .sess-row{display:flex;gap:8px;margin-bottom:10px}
-.sess-btn{flex:1;padding:10px;border-radius:8px;border:1px solid #252532;background:#1a1a24;color:#555;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation}
+.sess-btn{flex:1;padding:10px;border-radius:8px;border:1px solid #252532;background:#1a1a24;color:#555;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation}
 .sess-btn.active{border-color:#4fc3f7;color:#4fc3f7;background:rgba(79,195,247,.1)}
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:14px;font-weight:600}
 .b-突破多{background:rgba(255,82,82,.15);color:#ff5252;border:1px solid rgba(255,82,82,.4)}
 .b-維持多{background:rgba(255,152,0,.15);color:#ff9800;border:1px solid rgba(255,152,0,.4)}
 .b-維持空{background:rgba(105,240,174,.15);color:#69f0ae;border:1px solid rgba(105,240,174,.4)}
 .b-突破空{background:rgba(79,195,247,.15);color:#4fc3f7;border:1px solid rgba(79,195,247,.4)}
 .b-none{background:#1a1a24;color:#444;border:1px solid #252532}
 .dvd{height:1px;background:#1e1e28;margin:10px 0}
-.fetch-log{font-size:12px;margin:6px 0 4px;line-height:1.9;color:#666}
+.fetch-log{font-size:14px;margin:6px 0 4px;line-height:1.9;color:#666}
 .ok{color:#69f0ae}.err{color:#ff5252}.loading{color:#ffb74d}
 .spinner{display:inline-block;width:13px;height:13px;border:2px solid #333;border-top-color:#4fc3f7;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 .sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.sec-act{font-size:12px;color:#4fc3f7;cursor:pointer;touch-action:manipulation}
+.sec-act{font-size:14px;color:#4fc3f7;cursor:pointer;touch-action:manipulation}
 .hist-item{background:#1a1a24;border-radius:8px;padding:11px;margin-bottom:7px;border:1px solid #252532;cursor:pointer}
 .hist-det{display:none;margin-top:9px;padding-top:9px;border-top:1px solid #1e1e28}
 .hist-det.open{display:block}
 /* Sentiment */
 .sent-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .sent-item{background:#131318;border-radius:8px;padding:10px}
-.sent-lbl{font-size:11px;color:#555;margin-bottom:4px}
+.sent-lbl{font-size:13px;color:#555;margin-bottom:4px}
 .sent-val{font-size:20px;font-weight:700}
-.sent-sub{font-size:11px;color:#666;margin-top:2px}
+.sent-sub{font-size:13px;color:#666;margin-top:2px}
 .contra-dots{display:flex;gap:7px;align-items:center;margin-top:8px}
 .dot{width:13px;height:13px;border-radius:50%;background:#1e1e28}
 .dot.on{background:#ff9800}
-.signal-box{padding:11px 13px;border-radius:8px;font-size:13px;line-height:1.7;margin-bottom:10px}
+.signal-box{padding:11px 13px;border-radius:8px;font-size:15px;line-height:1.7;margin-bottom:10px}
 .sig-bull{background:rgba(255,82,82,.1);border-left:3px solid #ff5252}
 .sig-bear{background:rgba(79,195,247,.1);border-left:3px solid #4fc3f7}
 .sig-warn{background:rgba(255,152,0,.12);border-left:3px solid #ff9800}
 .sig-neu{background:#1a1a24;border-left:3px solid #333}
 /* Price table */
-.ptbl{width:100%;border-collapse:collapse;font-size:13px}
+.ptbl{width:100%;border-collapse:collapse;font-size:15px}
 .ptbl th{color:#444;font-weight:normal;padding:4px 6px;text-align:right;border-bottom:1px solid #1e1e28}
 .ptbl th:first-child{text-align:left}
 .ptbl td{padding:7px 6px;text-align:right;border-bottom:1px solid #131318}
@@ -75,9 +75,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .cr{color:#ff5252}.cm{color:#ffb74d}.cs{color:#69f0ae}.co{color:#90caf9}
 /* Chips */
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.chip{padding:8px 16px;border-radius:20px;border:1px solid #252532;background:#1a1a24;color:#777;font-size:13px;cursor:pointer;touch-action:manipulation}
+.chip{padding:8px 16px;border-radius:20px;border:1px solid #252532;background:#1a1a24;color:#777;font-size:15px;cursor:pointer;touch-action:manipulation}
 .chip.sel{border-color:#ffb74d;color:#ffb74d;background:rgba(255,183,77,.1)}
-.ana-title{font-size:11px;color:#4fc3f7;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;margin-top:12px}
+.ana-title{font-size:13px;color:#4fc3f7;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;margin-top:12px}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -92,7 +92,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <button class="tab-btn active" onclick="switchTab(0)">📊 數據</button>
   <button class="tab-btn" onclick="switchTab(1)">📈 市場情緒</button>
   <button class="tab-btn" onclick="switchTab(2)">📋 盤前記錄</button>
-  <button class="tab-btn" onclick="switchTab(3)">🎯 分析建議</button>
+  <button class="tab-btn" onclick="switchTab(3)">✅ 交易前確認</button>
 </div>
 
 <!-- ══════════ TAB 0: 數據 ══════════ -->
@@ -185,6 +185,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   </div>
 
   <button class="btn btn-green" id="save-btn" onclick="saveData()">✓ 儲存數據</button>
+  <button class="btn btn-gray" id="unlock-edit-btn" onclick="toggleUnlockEdit()">✏️ 解鎖編輯所有欄位</button>
 
   <!-- 歷史 -->
   <div class="card">
@@ -250,7 +251,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="card" style="padding:10px 6px">
     <div class="sec-hdr" style="padding:0 4px 8px"><h3>歷史觀察</h3><span class="sec-act" onclick="renderSentTable()">重整</span></div>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-      <table style="border-collapse:collapse;font-size:11px;white-space:nowrap;min-width:100%">
+      <table style="border-collapse:collapse;font-size:14px;white-space:nowrap;min-width:100%">
         <thead>
           <tr style="color:#555;border-bottom:1px solid #252532">
             <th style="padding:5px 6px;text-align:left;font-weight:500;position:sticky;left:0;background:#1a1a24;z-index:1">日期</th>
@@ -278,23 +279,42 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <table class="ptbl">
       <thead><tr><th>商品</th><th class="cr">壓力R</th><th class="cm">成本M</th><th class="cs">支撐S</th><th class="co">開盤</th></tr></thead>
       <tbody>
-        <tr><td>台指近</td><td class="cr" id="t2-n-r">—</td><td class="cm" id="t2-n-m">—</td><td class="cs" id="t2-n-s">—</td><td class="co" id="t2-n-o">—</td></tr>
-        <tr><td>台指近全</td><td class="cr" id="t2-f-r">—</td><td class="cm" id="t2-f-m">—</td><td class="cs" id="t2-f-s">—</td><td class="co" id="t2-f-o">—</td></tr>
-        <tr><td>台指PM</td><td class="cr" id="t2-p-r">—</td><td class="cm" id="t2-p-m">—</td><td class="cs" id="t2-p-s">—</td><td class="co" id="t2-p-o">—</td></tr>
+        <tr><td>台指近</td>
+          <td class="cr" id="t2-n-r" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="cm" id="t2-n-m" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="cs" id="t2-n-s" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="co" id="t2-n-o" onclick="setTarget(this)" style="cursor:pointer">—</td>
+        </tr>
+        <tr><td>台指近全</td>
+          <td class="cr" id="t2-f-r" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="cm" id="t2-f-m" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="cs" id="t2-f-s" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="co" id="t2-f-o" onclick="setTarget(this)" style="cursor:pointer">—</td>
+        </tr>
+        <tr><td>台指PM</td>
+          <td class="cr" id="t2-p-r" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="cm" id="t2-p-m" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="cs" id="t2-p-s" onclick="setTarget(this)" style="cursor:pointer">—</td>
+          <td class="co" id="t2-p-o" onclick="setTarget(this)" style="cursor:pointer">—</td>
+        </tr>
       </tbody>
     </table>
-    <div style="margin-top:7px;font-size:10px;color:#383848">R=高+(高-低)×0.382 ｜ M=(高+低)÷2 ｜ S=低-(高-低)×0.382</div>
+    <div style="margin-top:7px;font-size:12px;color:#383848">R=高+(高-低)×0.382 ｜ M=(高+低)÷2 ｜ S=低-(高-低)×0.382</div>
+    <div style="margin-top:4px;font-size:12px;color:#444">👆 點價格可設為今日目標</div>
   </div>
   <div class="card">
     <h3>三指標多空位階</h3>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
-      <div><div style="font-size:11px;color:#555;margin-bottom:5px">費半</div><div id="t2-sox" class="badge b-none">—</div></div>
-      <div><div style="font-size:11px;color:#555;margin-bottom:5px">加權</div><div id="t2-tai" class="badge b-none">—</div></div>
-      <div><div style="font-size:11px;color:#555;margin-bottom:5px">櫃加權</div><div id="t2-otc" class="badge b-none">—</div></div>
+      <div><div style="font-size:13px;color:#555;margin-bottom:5px">費半</div><div id="t2-sox" class="badge b-none">—</div><div id="t2-sox-chg" style="font-size:13px;color:#aaa;margin-top:6px;line-height:1.5"></div></div>
+      <div><div style="font-size:13px;color:#555;margin-bottom:5px">加權</div><div id="t2-tai" class="badge b-none">—</div><div id="t2-tai-chg" style="font-size:13px;color:#aaa;margin-top:6px;line-height:1.5"></div></div>
+      <div><div style="font-size:13px;color:#555;margin-bottom:5px">櫃加權</div><div id="t2-otc" class="badge b-none">—</div><div id="t2-otc-chg" style="font-size:13px;color:#aaa;margin-top:6px;line-height:1.5"></div></div>
     </div>
   </div>
   <div class="card">
-    <h3>市場情緒摘要</h3>
+    <div class="sec-hdr" style="margin-bottom:10px">
+      <h3>市場情緒摘要</h3>
+      <div id="t2-sent-note" style="font-size:12px;color:#ffb74d"></div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div><div class="sent-lbl">正逆價差</div><div style="font-size:18px;font-weight:600" id="t2-prem">—</div></div>
       <div><div class="sent-lbl">矛盾累積</div><div style="font-size:18px;font-weight:600" id="t2-contra">—</div></div>
@@ -302,43 +322,69 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <div><div class="sent-lbl">外資淨口數</div><div style="font-size:18px;font-weight:600" id="t2-fnet">—</div></div>
     </div>
   </div>
-  <div class="card" id="overlap-card" style="display:none">
-    <h3 style="color:#ffd54f">⚡ 價格重疊</h3>
-    <div id="overlap-list" style="margin-top:6px;font-size:13px;color:#ffd54f;line-height:2"></div>
+  <div class="card" id="price-ref-card">
+    <h3>價位參考</h3>
+    <div id="price-ref-body" style="margin-top:10px;color:#444;font-size:13px">—</div>
   </div>
+
+  <!-- 今日盤前規劃 -->
+  <div class="card" id="plan-card">
+    <div class="sec-hdr" style="margin-bottom:14px">
+      <h3>今日盤前規劃</h3>
+      <span id="plan-sess-tag" style="font-size:12px;color:#555"></span>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="sent-lbl" style="margin-bottom:8px">操作方向（可複選）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        <div class="chip" id="pd-多方" onclick="togglePlanDir('多方')">多方</div>
+        <div class="chip" id="pd-偏多" onclick="togglePlanDir('偏多')">偏多</div>
+        <div class="chip" id="pd-觀望" onclick="togglePlanDir('觀望')">觀望</div>
+        <div class="chip" id="pd-偏空" onclick="togglePlanDir('偏空')">偏空</div>
+        <div class="chip" id="pd-空方" onclick="togglePlanDir('空方')">空方</div>
+        <div class="chip" id="pd-拉高會殺" onclick="togglePlanDir('拉高會殺')">拉高會殺</div>
+        <div class="chip" id="pd-殺低有反彈機會" onclick="togglePlanDir('殺低有反彈機會')">殺低有反彈</div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="sent-lbl" style="margin-bottom:8px">前盤形態（選填）</div>
+      <div style="display:flex;gap:7px">
+        <div class="chip" id="pt-強趨勢" onclick="togglePlanTrend('強趨勢')">強趨勢</div>
+        <div class="chip" id="pt-雙巴" onclick="togglePlanTrend('雙巴')">雙巴</div>
+        <div class="chip" id="pt-穩趨勢" onclick="togglePlanTrend('穩趨勢')">穩趨勢</div>
+      </div>
+      <div id="plan-trend-hint" style="font-size:13px;color:#ffb74d;margin-top:7px;min-height:18px"></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="sent-lbl" style="margin-bottom:8px">目標價位 <span style="font-size:12px;color:#444;font-weight:400">先點下方框選擇，再點上方關鍵價格帶入</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div id="plan-target-r-box" onclick="selectTargetType('R')" style="cursor:pointer;border:1px solid #2a2a38;border-radius:8px;padding:10px;text-align:center;transition:border-color .15s">
+          <div style="font-size:12px;color:#ff5252;margin-bottom:5px">壓力目標</div>
+          <div id="plan-target-r-disp" style="font-size:20px;font-weight:700;color:#ffd54f">—</div>
+        </div>
+        <div id="plan-target-s-box" onclick="selectTargetType('S')" style="cursor:pointer;border:1px solid #2a2a38;border-radius:8px;padding:10px;text-align:center;transition:border-color .15s">
+          <div style="font-size:12px;color:#69f0ae;margin-bottom:5px">支撐目標</div>
+          <div id="plan-target-s-disp" style="font-size:20px;font-weight:700;color:#ffd54f">—</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="sent-lbl" style="margin-bottom:6px">規劃備注</div>
+      <textarea id="plan-note" style="width:100%;box-sizing:border-box;background:#131318;border:1px solid #2a2a38;border-radius:8px;color:#e0e0e0;font-size:14px;padding:10px;resize:vertical;min-height:80px;font-family:inherit;line-height:1.5" placeholder="今日操作思路、注意事項..."></textarea>
+    </div>
+    <button class="btn btn-blue" onclick="savePlanData()">💾 儲存規劃</button>
+  </div>
+
+  <!-- 歷史規劃回顧 -->
   <div class="card">
-    <h3>查看歷史規劃</h3>
-    <select id="hist-sel" onchange="loadHistRec()"><option value="">— 選擇日期 —</option></select>
+    <h3>歷史規劃回顧</h3>
+    <select id="hist-sel" onchange="loadHistRec()" style="margin-top:8px"><option value="">— 選擇日期 —</option></select>
+    <div id="hist-plan-detail" style="display:none;margin-top:14px;border-top:1px solid #1e1e28;padding-top:14px"></div>
   </div>
 </div>
 
-<!-- ══════════ TAB 3: 分析建議 ══════════ -->
+<!-- ══════════ TAB 3: 交易前確認 ══════════ -->
 <div class="pane" id="tab3">
-  <div class="card">
-    <h3>前一盤趨勢三角形</h3>
-    <div class="chips">
-      <div class="chip" id="ch-強趨勢" onclick="selTrend('強趨勢')">強趨勢</div>
-      <div class="chip" id="ch-雙巴" onclick="selTrend('雙巴')">雙巴</div>
-      <div class="chip" id="ch-穩趨勢" onclick="selTrend('穩趨勢')">穩趨勢（震盪）</div>
-    </div>
-  </div>
-  <div class="card">
-    <h3>上一盤走勢</h3>
-    <div class="row2">
-      <div class="ig"><span class="lbl">方向</span>
-        <select id="pd">
-          <option value="">選擇</option>
-          <option>大漲（>100點）</option><option>小漲（30-100點）</option>
-          <option>平盤（±30點）</option><option>小跌（30-100點）</option><option>大跌（>100點）</option>
-        </select>
-      </div>
-      <div class="ig"><span class="lbl">哪一盤</span>
-        <select id="ps"><option value="夜盤">夜盤</option><option value="早盤">早盤</option></select>
-      </div>
-    </div>
-  </div>
-  <button class="btn btn-blue" onclick="genAna()">⚡ 生成分析建議</button>
-  <div id="ana-out"></div>
+  <div id="confirm-out" style="display:flex;flex-direction:column;gap:12px"></div>
 </div>
 
 <!-- 狀態選單（浮動） -->
@@ -353,9 +399,13 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 // ══════════════════════════════════════════
 // STORAGE
 // ══════════════════════════════════════════
-const RK = 'txf_recs_v1', SK = 'txf_states_v1';
-let recs = [], sth = {};
-let curSess = '早盤', selTrendVal = null;
+const RK = 'txf_recs_v1', SK = 'txf_states_v1', PK = 'txf_plans_v1';
+let recs = [], sth = {}, plans = {};
+let curSess = '早盤';
+let _planTrend = null;
+let _unlockEdit = false;
+let _planDirs = [], _planTargetR = null, _planTargetS = null, _planActiveTarget = null;
+let _planDate = null, _planSess = null; // 目前規劃卡片顯示的日期/盤別（null = 今日當盤）
 
 function today() { return new Date().toISOString().split('T')[0]; }
 function getWorkDate() { const v = document.getElementById('work-date')?.value; return v || today(); }
@@ -378,7 +428,7 @@ function shiftDate(delta) {
   document.getElementById('work-date').value = cur.toISOString().split('T')[0];
   onDateChange();
 }
-function onDateChange() { updateDateDisp(); clearAllFields(); prefillForm(curSess); refreshStates(); loadSentRef(); }
+function onDateChange() { resetUnlockEdit(); updateDateDisp(); clearAllFields(); prefillForm(curSess); refreshStates(); loadSentRef(); renderPlanSection(); }
 
 function load() {
   try { recs = JSON.parse(localStorage.getItem(RK)||'[]'); } catch(e){recs=[];}
@@ -388,6 +438,137 @@ function save() {
   localStorage.setItem(RK, JSON.stringify(recs));
   localStorage.setItem(SK, JSON.stringify(sth));
   syncToFirebase();
+}
+function loadPlans() {
+  try { plans = JSON.parse(localStorage.getItem(PK)||'{}'); } catch(e){plans={};}
+}
+function savePlans() {
+  localStorage.setItem(PK, JSON.stringify(plans));
+}
+
+// ══════════════════════════════════════════
+// 盤前規劃 PLAN
+// ══════════════════════════════════════════
+function getPlanKey(date, sess) { return date+'_'+sess; }
+function getPlan(date, sess) { return plans[getPlanKey(date,sess)] || {dir:[],target:null,note:''}; }
+
+function trendNextHint(t) {
+  return {
+    強趨勢:'→ 必接雙巴，反向訊號出現可追，信心最高',
+    雙巴:  '→ 預期進入穩趨勢，但不知先打支撐還壓力',
+    穩趨勢:'→ 等待新一波強趨勢，方向未知，謹慎觀察'
+  }[t]||'';
+}
+
+function togglePlanDir(dir) {
+  const idx = _planDirs.indexOf(dir);
+  if (idx >= 0) _planDirs.splice(idx, 1); else _planDirs.push(dir);
+  renderPlanChips();
+}
+
+function renderPlanTrend() {
+  ['強趨勢','雙巴','穩趨勢'].forEach(x => {
+    const el = document.getElementById('pt-'+x);
+    if (el) el.classList.toggle('sel', x === _planTrend);
+  });
+  const hint = document.getElementById('plan-trend-hint');
+  if (hint) hint.textContent = _planTrend ? trendNextHint(_planTrend) : '';
+}
+
+function togglePlanTrend(t) {
+  _planTrend = (_planTrend === t) ? null : t;
+  renderPlanTrend();
+}
+
+function renderPlanChips() {
+  ['多方','偏多','觀望','偏空','空方','拉高會殺','殺低有反彈機會'].forEach(d => {
+    const el = document.getElementById('pd-'+d);
+    if (el) el.classList.toggle('sel', _planDirs.includes(d));
+  });
+}
+
+function selectTargetType(type) {
+  _planActiveTarget = (_planActiveTarget === type) ? null : type;
+  const rBox = document.getElementById('plan-target-r-box');
+  const sBox = document.getElementById('plan-target-s-box');
+  if (rBox) rBox.style.borderColor = _planActiveTarget==='R' ? '#ff5252' : '#2a2a38';
+  if (sBox) sBox.style.borderColor = _planActiveTarget==='S' ? '#69f0ae' : '#2a2a38';
+}
+
+function setTarget(el) {
+  const val = el.textContent.trim();
+  if (val === '—') return;
+  const num = parseInt(val.replace(/,/g,''));
+  if (isNaN(num)) return;
+  if (!_planActiveTarget) {
+    // 若未選框，提示使用者先選
+    const rBox = document.getElementById('plan-target-r-box');
+    if (rBox) { rBox.style.borderColor='#ff5252'; setTimeout(()=>{ if(_planActiveTarget!=='R') rBox.style.borderColor='#2a2a38'; },800); }
+    return;
+  }
+  if (_planActiveTarget === 'R') {
+    _planTargetR = num;
+    const d = document.getElementById('plan-target-r-disp');
+    if (d) d.textContent = num.toLocaleString();
+  } else {
+    _planTargetS = num;
+    const d = document.getElementById('plan-target-s-disp');
+    if (d) d.textContent = num.toLocaleString();
+  }
+  document.querySelectorAll('#tab2 .ptbl td[onclick]').forEach(td => td.style.background = '');
+  el.style.background = 'rgba(255,213,79,0.15)';
+}
+
+function renderPlanSection(date, sess) {
+  _planDate = date || null;
+  _planSess = sess || null;
+  const t = date || getWorkDate();
+  const s = sess || curSess;
+  const tag = document.getElementById('plan-sess-tag');
+  if (tag) tag.textContent = t.slice(5).replace('-','/') + ' ' + s;
+  const p = getPlan(t, s);
+  _planDirs = [...(p.dir||[])];
+  _planTargetR = p.targetR || null;
+  _planTargetS = p.targetS || null;
+  _planTrend = p.trend || null;
+  _planActiveTarget = null;
+  renderPlanChips();
+  renderPlanTrend();
+  const dr = document.getElementById('plan-target-r-disp');
+  const ds = document.getElementById('plan-target-s-disp');
+  if (dr) dr.textContent = _planTargetR ? _planTargetR.toLocaleString() : '—';
+  if (ds) ds.textContent = _planTargetS ? _planTargetS.toLocaleString() : '—';
+  const rBox = document.getElementById('plan-target-r-box');
+  const sBox = document.getElementById('plan-target-s-box');
+  if (rBox) rBox.style.borderColor = '#2a2a38';
+  if (sBox) sBox.style.borderColor = '#2a2a38';
+  const note = document.getElementById('plan-note');
+  if (note) note.value = p.note || '';
+  document.querySelectorAll('#tab2 .ptbl td[onclick]').forEach(td => td.style.background = '');
+}
+
+function savePlanData() {
+  const t = _planDate || getWorkDate();
+  const s = _planSess || curSess;
+  const note = document.getElementById('plan-note')?.value || '';
+  plans[getPlanKey(t, s)] = { dir:[..._planDirs], targetR:_planTargetR, targetS:_planTargetS, trend:_planTrend, note, ts:Date.now() };
+  savePlans();
+  const btn = document.querySelector('#plan-card .btn-blue');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✅ 已儲存';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  }
+}
+
+// 清除空白幽靈記錄（所有 OHLC 欄位皆為 null 的無效記錄）
+function cleanGhostRecs() {
+  const before = recs.length;
+  recs = recs.filter(r => [r.n,r.f,r.p,r.sox,r.tai,r.otc].some(d => d && d.c != null));
+  if (recs.length < before) {
+    localStorage.setItem(RK, JSON.stringify(recs));
+    console.log(`清除了 ${before - recs.length} 筆空白幽靈記錄`);
+  }
 }
 
 // ══════════════════════════════════════════
@@ -509,6 +690,19 @@ function fib(h, l) {
   return { r: Math.round(h+r*0.382), m: Math.round((h+l)/2), s: Math.round(l-r*0.382) };
 }
 
+// OHLC 有效性檢查（c 不為 null 才算有效，防止幽靈空記錄帶入）
+function validOHLC(d) { return !!(d && d.c != null); }
+
+// 偵測是否有台股休市的日期缺口（超過正常週末=週五→週一3天）
+function isHolidayGap(prevDate, curDate) {
+  const d1 = new Date(prevDate + 'T00:00:00');
+  const d2 = new Date(curDate  + 'T00:00:00');
+  const gap = Math.round((d2 - d1) / 86400000);
+  if (gap <= 1) return false;                          // 正常隔日
+  if (gap === 3 && d1.getDay() === 5) return false;   // 正常週五→週一
+  return gap > 1;                                      // 其餘皆為非正常缺口
+}
+
 function detState(c, pr, ps, pst) {
   c=parseFloat(c); pr=parseFloat(pr); ps=parseFloat(ps);
   if(isNaN(c)||isNaN(pr)||isNaN(ps)) return null;
@@ -568,9 +762,11 @@ function setFieldsLocked(groups, locked, tag) {
 // ══════════════════════════════════════════
 function setSession(s) {
   curSess = s;
+  resetUnlockEdit();
   document.getElementById('sb0').classList.toggle('active', s==='早盤');
   document.getElementById('sb1').classList.toggle('active', s==='午盤');
   prefillForm(s);
+  renderPlanSection();
 }
 
 function prefillForm(sess) {
@@ -581,15 +777,20 @@ function prefillForm(sess) {
   clearAllFields();
 
   if (sess === '早盤') {
-    // Lock: 台指近、台指近全、加權、櫃加 → from yesterday's 午盤
-    // Editable: 台指PM近、費半
-    const yRec = getLatestRec(null, t, '午盤'); // before today, 午盤
-    if (yRec) {
-      setOHLC('n', yRec.n); setOHLC('f', yRec.f);
-      setOHLC('tai', yRec.tai); setOHLC('otc', yRec.otc);
-      setFieldsLocked(['n','f','tai','otc'], true, '昨日午盤');
-    }
+    // 先取得前日午盤，再決定鎖定標籤文字
     setFieldsLocked(['p','sox'], false, null);
+    const yRec = getLatestRec(null, t, '午盤');
+    const lockTag = (yRec && isHolidayGap(yRec.date, t))
+      ? `台股休市，沿用 ${yRec.date.slice(5).replace('-','/')}`
+      : '昨日午盤';
+    setFieldsLocked(['n','f','tai','otc'], true, lockTag);
+    // 填入前日午盤資料（使用 validOHLC 防止空白幽靈記錄帶入）
+    if (yRec) {
+      if (validOHLC(yRec.n)) setOHLC('n', yRec.n);
+      if (validOHLC(yRec.f)) setOHLC('f', yRec.f);
+      if (validOHLC(yRec.tai)) setOHLC('tai', yRec.tai);
+      if (validOHLC(yRec.otc)) setOHLC('otc', yRec.otc);
+    }
     // 若今天早盤已儲存，全部帶回來（n/f 雖鎖定但同步顯示已存值）
     const todayMorn = getTodayRec('早盤');
     if (todayMorn) {
@@ -599,15 +800,14 @@ function prefillForm(sess) {
     }
 
   } else { // 午盤
-    // Lock: 台指PM近、費半 → from today's 早盤（或目前表單）
-    // Editable: 台指近、台指近全、加權、櫃加
+    // 先套用鎖定（Fix5）
+    setFieldsLocked(['p','sox'], true, '今日早盤');
+    setFieldsLocked(['n','f','tai','otc'], false, null);
     const mornRec = getTodayRec('早盤');
     const pData   = mornRec?.p   || (snapP.c   ? snapP   : null);
     const soxData = mornRec?.sox || (snapSox.c ? snapSox : null);
-    if (pData)   setOHLC('p',   pData);
-    if (soxData) setOHLC('sox', soxData);
-    if (pData || soxData) setFieldsLocked(['p','sox'], true, '今日早盤');
-    setFieldsLocked(['n','f','tai','otc'], false, null);
+    if (validOHLC(pData)) setOHLC('p', pData);
+    if (validOHLC(soxData)) setOHLC('sox', soxData);
     // If today's 午盤 already saved, fill those too
     const afRec = getTodayRec('午盤');
     if (afRec) {
@@ -643,13 +843,13 @@ function getTodayRec(sess) {
 }
 
 function getLatestRec(date, beforeDate, sess) {
-  // Get latest record before beforeDate with given session
+  // Get latest record before beforeDate with given session（日期優先排序，防止亂序）
   return recs.filter(r => {
     if(sess && r.session!==sess) return false;
     if(date && r.date!==date) return false;
     if(beforeDate && r.date>=beforeDate) return false;
     return true;
-  }).sort((a,b)=>b.ts-a.ts)[0] || null;
+  }).sort((a,b) => b.date.localeCompare(a.date) || b.ts-a.ts)[0] || null;
 }
 
 function getLatestAnyRec() { return recs.sort((a,b)=>b.ts-a.ts)[0] || null; }
@@ -855,6 +1055,16 @@ function buildSymData(sym) {
 
 function saveData() {
   const t = getWorkDate();
+
+  // 防空儲存：可編輯欄位全空時阻止存入幽靈記錄（Fix1）
+  const editFields = _unlockEdit
+    ? ['n-c','f-c','p-c','sox-c','tai-c','otc-c']
+    : curSess === '早盤' ? ['p-c','sox-c'] : ['n-c','f-c','tai-c','otc-c'];
+  if (!editFields.some(id => getVal(id) != null)) {
+    alert('⚠️ 所有可編輯欄位皆為空白，本次不儲存。\n\n若為休市日，直接關閉頁面即可，不需按儲存。');
+    return;
+  }
+
   const sox = buildSymData('sox'), tai = buildSymData('tai'), otc = buildSymData('otc');
 
   // Build merged record
@@ -865,26 +1075,34 @@ function saveData() {
   }
   rec.ts = Date.now();
 
-  if(curSess === '早盤') {
+  if (_unlockEdit) {
+    // 解鎖模式：所有欄位直接從表單讀取（Fix7）
+    rec.n = buildOHLC('n', true);
+    rec.f = buildOHLC('f', true);
+    rec.p = buildOHLC('p', true);
+    rec.sox = buildSymData('sox');
+    rec.tai = buildSymData('tai');
+    rec.otc = buildSymData('otc');
+  } else if(curSess === '早盤') {
     // Update PM近 and 費半 (the new data)
     rec.p = buildOHLC('p', true);
     rec.sox = sox;
-    // Carry over from yesterday for display
+    // Carry over from yesterday（使用 validOHLC 防止幽靈記錄蓋掉有效資料，Fix3）
     const yRec = getLatestRec(null, t, '午盤');
-    rec.n = yRec?.n || buildOHLC('n', true);
-    rec.f = yRec?.f || buildOHLC('f', true);
-    rec.tai = yRec?.tai || tai;
-    rec.otc = yRec?.otc || otc;
+    rec.n = validOHLC(yRec?.n) ? yRec.n : buildOHLC('n', true);
+    rec.f = validOHLC(yRec?.f) ? yRec.f : buildOHLC('f', true);
+    rec.tai = validOHLC(yRec?.tai) ? yRec.tai : tai;
+    rec.otc = validOHLC(yRec?.otc) ? yRec.otc : otc;
   } else {
     // Update 台指近/近全/加權/櫃加
     rec.n = buildOHLC('n', true);
     rec.f = buildOHLC('f', true);
     rec.tai = tai;
     rec.otc = otc;
-    // Carry PM近 and 費半 from morning
+    // Carry PM近 and 費半 from morning（Fix3）
     const mRec = getTodayRec('早盤');
-    rec.p = mRec?.p || buildOHLC('p', true);
-    rec.sox = mRec?.sox || sox;
+    rec.p = validOHLC(mRec?.p) ? mRec.p : buildOHLC('p', true);
+    rec.sox = validOHLC(mRec?.sox) ? mRec.sox : sox;
   }
 
   // Update state history（保留手動設定的狀態，不被 null 蓋掉）
@@ -906,6 +1124,9 @@ function saveData() {
   save(); renderHist(); updateHistSel();
   renderTab2(rec);
 
+  // 儲存後重置解鎖狀態（Fix7）
+  if (_unlockEdit) { resetUnlockEdit(); prefillForm(curSess); }
+
   const btn = document.getElementById('save-btn');
   btn.textContent='✓ 已儲存！'; btn.style.background='#2e7d32';
   setTimeout(()=>{btn.textContent='✓ 儲存數據'; btn.style.background='#69f0ae';}, 2000);
@@ -914,21 +1135,29 @@ function saveData() {
 // ══════════════════════════════════════════
 // HISTORY RENDER (Tab 0)
 // ══════════════════════════════════════════
+// 偵測台股休市（台指/加權全空，但費半有資料）
+function isTwHoliday(r) {
+  return r.sox?.c != null && r.n?.c == null && r.f?.c == null && r.p?.c == null && r.tai?.c == null;
+}
+
 function renderHist() {
   const cont = document.getElementById('hist');
   if(!recs.length) { cont.innerHTML='<div style="color:#444;text-align:center;padding:18px;font-size:13px">尚無記錄</div>'; return; }
   cont.innerHTML = recs.slice(0,40).map((r,i) => {
+    const holiday = isTwHoliday(r);
     const bgs = ['sox','tai','otc'].map(sym => {
       const st = r[sym]?.state || sth[r.date]?.[sym]?.state;
       return st?`<span class="badge b-${st}" style="font-size:10px;padding:2px 6px">${st}</span>`:'';
     }).join(' ');
+    const holidayBadge = holiday ? `<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(255,183,77,.12);color:#ffb74d;border:1px solid rgba(255,183,77,.3);margin-left:2px">🏖️ 台股休市</span>` : '';
     return `<div class="hist-item" onclick="toggleDet(this)">
       <div style="display:flex;justify-content:space-between">
-        <div><span style="font-size:12px;color:#555">${r.date} ${r.session}</span><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">${bgs}</div></div>
+        <div><span style="font-size:12px;color:#555">${r.date} ${r.session}</span><div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">${bgs}${holidayBadge}</div></div>
         <span style="color:#333;font-size:12px">▼</span>
       </div>
       <div class="hist-det">
-        ${oRow('台指近',r.n)}${oRow('台指近全',r.f)}${oRow('台指PM',r.p)}
+        ${holiday ? '<div style="font-size:12px;color:#ffb74d;margin-bottom:6px">🏖️ 台股休市，僅記錄費半</div>' : ''}
+        ${holiday ? '' : oRow('台指近',r.n)+oRow('台指近全',r.f)+oRow('台指PM',r.p)}
         <div style="height:1px;background:#1e1e28;margin:6px 0"></div>
         ${oRow('費半',r.sox)}${oRow('加權',r.tai)}${oRow('櫃加',r.otc)}
         ${r.sent?.premium!=null?`<div style="font-size:12px;color:#666;margin-top:6px">正逆價差：${r.sent.premium>0?'+':''}${r.sent.premium}點 ｜ VIX：${r.sent.vix||'—'} ｜ 矛盾：${r.sent.contradictionCount||0}</div>`:''}
@@ -961,7 +1190,15 @@ function loadRec(e, i) {
 
   setOHLC('n',r.n); setOHLC('f',r.f); setOHLC('p',r.p);
   setOHLC('sox',r.sox); setOHLC('tai',r.tai); setOHLC('otc',r.otc);
-  setFieldsLocked(['n','f','p','sox','tai','otc'], false, null);
+  // 依盤別套用正確鎖定，不全部解鎖（Fix6）
+  resetUnlockEdit();
+  if (r.session === '早盤') {
+    setFieldsLocked(['n','f','tai','otc'], true, '昨日午盤');
+    setFieldsLocked(['p','sox'], false, null);
+  } else {
+    setFieldsLocked(['p','sox'], true, '今日早盤');
+    setFieldsLocked(['n','f','tai','otc'], false, null);
+  }
   // 載入既有記錄時，直接顯示已儲存的狀態，不重算（避免前日資料缺失導致算錯）
   ['sox','tai','otc'].forEach(sym => {
     const st = r[sym]?.state || sth[r.date]?.[sym]?.state || null;
@@ -994,8 +1231,38 @@ function updateHistSel() {
 }
 
 function loadHistRec() {
+  const detail = document.getElementById('hist-plan-detail');
   const i = document.getElementById('hist-sel').value;
-  renderTab2(i!==''?recs[parseInt(i)]:recs[0]);
+  if (i === '') {
+    if (detail) detail.style.display = 'none';
+    renderTab2(recs[0]);
+    renderPlanSection();
+    return;
+  }
+  const r = recs[parseInt(i)];
+  renderTab2(r);
+  if (!detail) return;
+  const p = getPlan(r.date, r.session);
+  const hasPlan = p.dir?.length || p.targetR || p.targetS || p.note;
+  if (!hasPlan) {
+    detail.innerHTML = `<div style="font-size:13px;color:#444;text-align:center;padding:8px">此盤尚無規劃記錄</div>`;
+  } else {
+    const dirText = p.dir?.length ? p.dir.map(d=>`<span style="background:#1e2a3a;color:#4fc3f7;border-radius:6px;padding:2px 8px;font-size:13px">${d}</span>`).join(' ') : '<span style="color:#444">未記錄</span>';
+    const targetRText = p.targetR ? `<span style="color:#ffd54f;font-size:18px;font-weight:700">${p.targetR.toLocaleString()}</span>` : '<span style="color:#444">—</span>';
+    const targetSText = p.targetS ? `<span style="color:#ffd54f;font-size:18px;font-weight:700">${p.targetS.toLocaleString()}</span>` : '<span style="color:#444">—</span>';
+    const noteText = p.note ? p.note.replace(/</g,'&lt;').replace(/\n/g,'<br>') : '<span style="color:#444">無</span>';
+    detail.innerHTML = `
+      <div style="font-size:12px;color:#555;margin-bottom:10px">${r.date} ${r.session} 規劃</div>
+      <div style="margin-bottom:10px"><div class="sent-lbl" style="margin-bottom:5px">操作方向</div><div style="display:flex;flex-wrap:wrap;gap:5px">${dirText}</div></div>
+      <div style="margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><div style="font-size:12px;color:#ff5252;margin-bottom:4px">壓力目標</div>${targetRText}</div>
+        <div><div style="font-size:12px;color:#69f0ae;margin-bottom:4px">支撐目標</div>${targetSText}</div>
+      </div>
+      <div><div class="sent-lbl" style="margin-bottom:5px">規劃備注</div><div style="font-size:14px;color:#ccc;line-height:1.7">${noteText}</div></div>
+    `;
+  }
+  detail.style.display = 'block';
+  renderPlanSection(r.date, r.session);
 }
 
 function doClear() {
@@ -1103,18 +1370,23 @@ function calcSent() {
   const pEl = document.getElementById('sc-premium');
   if(premium!=null) {
     pEl.textContent = (premium>0?'+':'')+premium+'點 '+(premium>0?'正價差':'逆價差');
-    pEl.style.color = premium>0?'#ff5252':'#4fc3f7';
+    pEl.style.color = premium>0?'#ff9800':'#90caf9';
   } else { pEl.textContent = txfC&&taiC ? '—' : '需先儲存台指+加權數據'; pEl.style.color='#555'; }
 
-  // VIX
-  const vEl = document.getElementById('sc-vix-short');
-  if(vix) { vEl.textContent='VIX '+vix; vEl.style.color=vix>25?'#ff5252':vix>20?'#ffb74d':'#69f0ae'; }
-  else vEl.textContent='';
-
-  // Prev premium for contradiction calc
+  // Prev record（先取得，才能算VIX趨勢）
   const prevRec = getLatestRec(null, t, '午盤') || getLatestRec(null, t, '早盤');
   const prevPrem = prevRec?.sent?.premium;
+  const prevVix = prevRec?.sent?.vix ?? null;
   const switched = (premium!=null && prevPrem!=null) ? (premium>0)!==(prevPrem>0) : false;
+
+  // VIX - 看趨勢（上升=空，下降=多）
+  const vixChg = (vix!=null && prevVix!=null) ? vix - prevVix : null;
+  const vEl = document.getElementById('sc-vix-short');
+  if(vix) {
+    const arr = vixChg==null?'':vixChg>0?' ↑':vixChg<0?' ↓':'';
+    const vixCol = vixChg==null?'#aaa':vixChg>0?'#ff5252':'#69f0ae';
+    vEl.textContent='VIX '+vix+arr; vEl.style.color=vixCol;
+  } else vEl.textContent='';
 
   let hasCont=false, premChg=null;
   if(premium!=null && prevPrem!=null) {
@@ -1149,9 +1421,8 @@ function calcSent() {
   const volEl = document.getElementById('sc-vol');
   let volJudge = null;
   if(fvol!=null && tvol!=null) {
-    const prevSentRec = getLatestRec(null, t, '午盤') || getLatestRec(null, t, '早盤');
-    const prevFvol = prevSentRec?.sent?.fvol ?? null;
-    const prevTvol = prevSentRec?.sent?.tvol ?? null;
+    const prevFvol = prevRec?.sent?.fvol ?? null;
+    const prevTvol = prevRec?.sent?.tvol ?? null;
     if(prevFvol!=null && prevTvol!=null) {
       const fInc = fvol > prevFvol;
       const tInc = tvol > prevTvol;
@@ -1174,6 +1445,7 @@ function calcSent() {
     premiumChange:premChg!=null?Math.round(premChg):null,
     premiumSwitch:switched, hasContradiction:hasCont,
     contradictionCount:count,
+    vixChg: vixChg!=null?parseFloat(vixChg.toFixed(2)):null,
     fvol: fvol??null, tvol: tvol??null, volJudge
   };
 }
@@ -1226,15 +1498,15 @@ function renderSentTable() {
     prevCount = count;
     prevRec2 = rec;
     const ds = date.slice(5).replace('-','/');
-    const pCol = premium>0?'#ff5252':premium<0?'#4fc3f7':'#aaa';
+    const pCol = premium>0?'#ff9800':premium<0?'#90caf9':'#aaa';
     const cCol = premChange>0?'#ff5252':premChange<0?'#69f0ae':'#aaa';
-    const vCol = vix>25?'#ff5252':vix>20?'#ffb74d':'#69f0ae';
+    const vCol = vixChg==null?'#555':vixChg>0?'#ff5252':'#69f0ae';
     const fCol = fnet>0?'#ff5252':fnet<0?'#69f0ae':'#aaa';
     const vJCol = volJudge==='趨勢推'?'#ff9800':volJudge==='觀望盤'?'#555':'#4fc3f7';
     let sig='';
-    if(hasCont) sig+=`<span style="color:#ff9800;font-size:10px">矛${count}</span>`;
-    if(switched) sig+=`<span style="color:#4fc3f7;font-size:10px${hasCont?' margin-left:2px':''}">轉</span>`;
-    if(!hasCont&&!switched&&count>0) sig+=`<span style="color:#555;font-size:10px">${count}</span>`;
+    if(hasCont) sig+=`<span style="color:#ff9800;font-size:13px">矛${count}</span>`;
+    if(switched) sig+=`<span style="color:#4fc3f7;font-size:13px${hasCont?' margin-left:2px':''}">轉</span>`;
+    if(!hasCont&&!switched&&count>0) sig+=`<span style="color:#555;font-size:13px">${count}</span>`;
     if(!sig) sig='<span style="color:#252532">—</span>';
     const isActive = date === getWorkDate();
     return `<tr style="border-bottom:1px solid #1a1a22;cursor:pointer;${isActive?'background:rgba(79,195,247,.07)':''}" onclick="loadSentRec('${date}')" title="點擊載入此日數據">
@@ -1246,7 +1518,7 @@ function renderSentTable() {
       <td style="padding:5px 4px;text-align:right;color:${cCol}">${premChange!=null?(premChange>0?'+':'')+premChange:'—'}</td>
       <td style="padding:5px 4px;text-align:right;color:${vCol}">${vix||'—'}</td>
       <td style="padding:5px 4px;text-align:right;color:${vixChg==null?'#444':vixChg>0?'#ff5252':'#69f0ae'}">${vixChg==null?'—':(vixChg>0?'+':'')+vixChg.toFixed(1)+'%'}</td>
-      <td style="padding:5px 4px;text-align:center;color:${vJCol};font-size:10px">${volJudge||'—'}</td>
+      <td style="padding:5px 4px;text-align:center;color:${vJCol};font-size:13px">${volJudge||'—'}</td>
       <td style="padding:5px 6px;text-align:center">${sig}</td>
     </tr>`;
   });
@@ -1276,155 +1548,222 @@ function renderTab2(rec) {
   if(!rec) return;
 
   const prods = [{data:rec.n,pre:'n'},{data:rec.f,pre:'f'},{data:rec.p,pre:'p'}];
-  let allPrices = [];
   prods.forEach(({data,pre}) => {
     if(!data?.h||!data?.l) { ['r','m','s','o'].forEach(k=>{document.getElementById('t2-'+pre+'-'+k).textContent='—';}); return; }
     const fb = fib(data.h, data.l); if(!fb) return;
-    const names={n:'台指近',f:'台指近全',p:'台指PM'};
     document.getElementById('t2-'+pre+'-r').textContent=fb.r.toLocaleString();
     document.getElementById('t2-'+pre+'-m').textContent=fb.m.toLocaleString();
     document.getElementById('t2-'+pre+'-s').textContent=fb.s.toLocaleString();
     document.getElementById('t2-'+pre+'-o').textContent=data.o?Math.round(data.o).toLocaleString():'—';
-    allPrices.push({n:names[pre],t:'R',v:fb.r},{n:names[pre],t:'M',v:fb.m},{n:names[pre],t:'S',v:fb.s});
   });
 
-  // States
+  // States + 前盤狀態變化
+  const prevRec2 = [...recs]
+    .filter(r => r.date < rec.date || (r.date === rec.date && r.session === '早盤' && rec.session === '午盤'))
+    .sort((a,b) => b.date.localeCompare(a.date)||(b.session==='午盤'?1:-1))[0];
   [{sym:'sox',id:'t2-sox'},{sym:'tai',id:'t2-tai'},{sym:'otc',id:'t2-otc'}].forEach(({sym,id}) => {
     const st = rec[sym]?.state||'—';
     const el = document.getElementById(id);
     el.textContent=st; el.className='badge '+(st!=='—'?'b-'+st:'b-none');
+    const chgEl = document.getElementById(id+'-chg');
+    if (chgEl) {
+      const prev = prevRec2?.[sym]?.state;
+      chgEl.textContent = prev && prev !== st ? prev+' → '+st : prev ? prev+' → '+st : '';
+    }
   });
 
   // Sentiment summary
   const s = rec.sent||{};
   const pEl = document.getElementById('t2-prem');
-  if(s.premium!=null){pEl.textContent=(s.premium>0?'+':'')+s.premium+'點';pEl.style.color=s.premium>0?'#ff5252':'#4fc3f7';}else pEl.textContent='—';
-  document.getElementById('t2-contra').textContent = s.contradictionCount!=null?s.contradictionCount+'個':'—';
-  const vEl=document.getElementById('t2-vix');
-  if(s.vix){vEl.textContent=s.vix;vEl.style.color=s.vix>25?'#ff5252':s.vix>20?'#ffb74d':'#69f0ae';}else vEl.textContent='—';
-  const fEl=document.getElementById('t2-fnet');
-  if(s.fnet!=null){fEl.textContent=(s.fnet>0?'+':'')+s.fnet;fEl.style.color=s.fnet>0?'#ff5252':'#69f0ae';}else fEl.textContent='—';
+  const vEl = document.getElementById('t2-vix');
+  const fEl = document.getElementById('t2-fnet');
+  const sentNote = document.getElementById('t2-sent-note');
+  const hasSent = s.premium!=null || s.vix || s.fnet!=null;
 
-  // Overlaps
-  const ovlp=[];
-  for(let i=0;i<allPrices.length;i++) for(let j=i+1;j<allPrices.length;j++) {
-    if(Math.abs(allPrices[i].v-allPrices[j].v)<=50) ovlp.push(`${allPrices[i].n} ${allPrices[i].t}(${allPrices[i].v}) ≈ ${allPrices[j].n} ${allPrices[j].t}(${allPrices[j].v})`);
+  function applySent(sd) {
+    if(sd.premium!=null){pEl.textContent=(sd.premium>0?'+':'')+sd.premium+'點';pEl.style.color=sd.premium>0?'#ff9800':'#90caf9';}else pEl.textContent='—';
+    document.getElementById('t2-contra').textContent = sd.contradictionCount!=null?sd.contradictionCount+'個':'—';
+    if(sd.vix){const vc=sd.vixChg!=null?(sd.vixChg>0?' ↑':sd.vixChg<0?' ↓':''):'';const vcol=sd.vixChg!=null?(sd.vixChg>0?'#ff5252':'#69f0ae'):'#aaa';vEl.textContent=sd.vix+vc;vEl.style.color=vcol;}else vEl.textContent='—';
+    if(sd.fnet!=null){fEl.textContent=(sd.fnet>0?'+':'')+sd.fnet;fEl.style.color=sd.fnet>0?'#ff5252':'#69f0ae';}else fEl.textContent='—';
   }
-  document.getElementById('overlap-card').style.display=ovlp.length?'block':'none';
-  document.getElementById('overlap-list').innerHTML=ovlp.map(o=>`<div>⚡ ${o}</div>`).join('');
+
+  if (hasSent) {
+    applySent(s);
+    if (sentNote) sentNote.textContent = '';
+  } else {
+    // 沿用前一筆有市場情緒資料的記錄
+    const prev = [...recs]
+      .filter(r => r.date < rec.date)
+      .sort((a,b) => b.date.localeCompare(a.date)||(b.session==='午盤'?1:-1))
+      .find(r => r.sent?.vix || r.sent?.premium!=null || r.sent?.fnet!=null);
+    if (prev) {
+      applySent(prev.sent||{});
+      if (sentNote) sentNote.textContent = `沿用 ${prev.date.slice(5).replace('-','/')} ${prev.session}`;
+    } else {
+      applySent({});
+      if (sentNote) sentNote.textContent = '';
+    }
+  }
+
+  renderPriceRef(rec);
+}
+
+function renderPriceRef(rec) {
+  const body = document.getElementById('price-ref-body');
+  if (!body) return;
+  if (!rec?.n?.h || !rec?.n?.l) { body.innerHTML = '<span style="color:#444">數據不足</span>'; return; }
+  const amp = Math.round(rec.n.h - rec.n.l);
+  const close = rec.n.c;
+  const closeDisp = close != null ? close.toLocaleString() : '—';
+  body.innerHTML = `<span style="color:#888;font-size:13px">收盤</span> <span style="color:#e0e0e0;font-size:16px;font-weight:600">${closeDisp}</span><span style="color:#444;margin:0 10px">｜</span><span style="color:#888;font-size:13px">振幅</span> <span style="color:#e0e0e0;font-size:16px;font-weight:600">${amp}pt</span>`;
 }
 
 // ══════════════════════════════════════════
-// TAB 3: ANALYSIS
+// TAB 3: 交易前確認
 // ══════════════════════════════════════════
-function selTrend(t) {
-  selTrendVal=t;
-  ['強趨勢','雙巴','穩趨勢'].forEach(x=>document.getElementById('ch-'+x).classList.toggle('sel',x===t));
+function renderConfirm() {
+  const out = document.getElementById('confirm-out');
+  if (!out) return;
+
+  const t = _planDate || getWorkDate();
+  const s = _planSess || curSess;
+  const rec = recs.find(r => r.date === t) || recs[0];
+  const sent = rec?.sent || {};
+  const p = getPlan(t, s);
+
+  // 找前一筆 rec，動態補算歷史資料沒有儲存的欄位
+  const prevSentRec = [...recs]
+    .filter(r => r.date < rec?.date || (r.date === rec?.date && r.session === '早盤' && rec?.session === '午盤'))
+    .sort((a,b) => b.date.localeCompare(a.date)||(b.session==='午盤'?1:-1))[0];
+  const prevSent = prevSentRec?.sent || {};
+  // Premium（從價格資料動態算，若 sent 沒有）
+  const _txfC = rec?.n?.c || rec?.f?.c || rec?.p?.c;
+  const _taiC = rec?.tai?.c;
+  const dynPremium = sent.premium ?? ((_txfC && _taiC) ? Math.round(_txfC - _taiC + (sent.evaporation||0)) : null);
+  const _ptxf = prevSentRec?.n?.c || prevSentRec?.f?.c || prevSentRec?.p?.c;
+  const _ptai = prevSentRec?.tai?.c;
+  const prevPrem3 = prevSent.premium ?? ((_ptxf && _ptai) ? Math.round(_ptxf - _ptai + (prevSent.evaporation||0)) : null);
+  const dynPremChg = sent.premiumChange ?? ((dynPremium != null && prevPrem3 != null) ? dynPremium - prevPrem3 : null);
+  const dynVixChg = sent.vixChg ?? ((sent.vix != null && prevSent.vix != null) ? parseFloat((sent.vix - prevSent.vix).toFixed(2)) : null);
+  const dynVolJudge = sent.volJudge || (() => {
+    if(sent.fvol==null||sent.tvol==null||prevSent.fvol==null||prevSent.tvol==null) return null;
+    const fInc=sent.fvol>prevSent.fvol, tInc=sent.tvol>prevSent.tvol;
+    return (fInc&&tInc)?'趨勢推':(!fInc&&!tInc)?'觀望盤':'震盪盤';
+  })();
+  const _fInc = (sent.fvol!=null&&prevSent.fvol!=null) ? sent.fvol>prevSent.fvol : null;
+  const _tInc = (sent.tvol!=null&&prevSent.tvol!=null) ? sent.tvol>prevSent.tvol : null;
+
+  // 選擇權限制
+  const sts = [rec?.sox?.state, rec?.tai?.state, rec?.otc?.state];
+  const brkBull = sts.filter(x => x==='突破多').length;
+  const brkBear = sts.filter(x => x==='突破空').length;
+  const scLine = brkBull > 0
+    ? `<div style="color:#ff5252;font-size:15px">⛔ 禁止 SC（賣出買權）</div><div style="color:#555;font-size:12px;margin-left:2px;margin-bottom:4px">突破多 × ${brkBull}</div>`
+    : `<div style="color:#69f0ae;font-size:15px">✅ SC 可操作</div>`;
+  const spLine = brkBear > 0
+    ? `<div style="color:#ff5252;font-size:15px">⛔ 禁止 SP（賣出賣權）</div><div style="color:#555;font-size:12px;margin-left:2px;margin-bottom:4px">突破空 × ${brkBear}</div>`
+    : `<div style="color:#69f0ae;font-size:15px">✅ SP 可操作</div>`;
+
+  // 矛盾警示
+  const contra = sent.contradictionCount || 0;
+  const contraHTML = contra >= 2
+    ? `<div class="card"><div style="color:#ffb74d;font-size:15px">⚠️ 矛盾累積 ${contra} 個</div><div style="color:#555;font-size:13px;margin-top:4px">留意方向轉換風險</div></div>`
+    : '';
+
+  // 規劃摘要
+  const hasPlan = p.dir?.length || p.targetR || p.targetS || p.trend || p.note;
+  let planBody = '';
+  if (hasPlan) {
+    const dirText = p.dir?.length ? p.dir.join('、') : '—';
+    planBody += `<div style="margin-bottom:8px"><span style="color:#555;font-size:13px">方向　</span><span style="color:#e0e0e0;font-size:14px">${dirText}</span></div>`;
+    if (p.trend) planBody += `<div style="margin-bottom:8px"><span style="color:#555;font-size:13px">前盤　</span><span style="color:#e0e0e0;font-size:14px">${p.trend}</span> <span style="color:#ffb74d;font-size:13px">${trendNextHint(p.trend)}</span></div>`;
+    if (p.targetR) planBody += `<div style="margin-bottom:4px"><span style="color:#ff5252;font-size:13px">壓力　</span><span style="color:#ffd54f;font-size:16px;font-weight:700">${p.targetR.toLocaleString()}</span></div>`;
+    if (p.targetS) planBody += `<div style="margin-bottom:8px"><span style="color:#69f0ae;font-size:13px">支撐　</span><span style="color:#ffd54f;font-size:16px;font-weight:700">${p.targetS.toLocaleString()}</span></div>`;
+    if (p.note) planBody += `<div style="border-top:1px solid #1e1e28;padding-top:8px;font-size:14px;color:#aaa;line-height:1.7">${p.note.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`;
+  } else {
+    planBody = `<div style="color:#444;font-size:13px">尚未填寫今日規劃<br><span style="font-size:12px">請先到「盤前記錄」填寫</span></div>`;
+  }
+
+  // 市場情緒綜合判斷
+  const bullVotes=[], bearVotes=[];
+  const sentRows=[];
+  const sRow=(lbl,detail,judge,isB)=>{
+    const col=judge==='—'?'#333':isB?'#ff5252':'#4fc3f7';
+    const dCol=judge==='—'?'#333':'#aaa';
+    return `<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid #131318">
+      <span style="color:#555;font-size:13px;width:36px;flex-shrink:0">${lbl}</span>
+      <span style="color:${dCol};font-size:13px;flex:1">${detail}</span>
+      <span style="color:${col};font-size:13px;font-weight:600;width:36px;text-align:right">${judge}</span>
+    </div>`;
+  };
+  // 外資
+  if(sent.fnet!=null){
+    const isB=sent.fnet>0;
+    if(isB) bullVotes.push(1); else bearVotes.push(1);
+    sentRows.push(sRow('外資',`${sent.fnet>0?'+':''}${sent.fnet.toLocaleString()} 口 → ${isB?'正口數':'負口數'}`,isB?'偏多':'偏空',isB));
+  } else { sentRows.push(sRow('外資','無資料','—',false)); }
+
+  // 正逆價差
+  if(dynPremium!=null && dynPremChg!=null){
+    const pType=dynPremium>0?'正價差':'逆價差';
+    const isB=dynPremChg<0;
+    const chgWord=dynPremium>0?(dynPremChg>0?'擴散':'收斂'):(dynPremChg<0?'擴散':'收斂');
+    if(isB) bullVotes.push(1); else bearVotes.push(1);
+    sentRows.push(sRow('價差',`${pType} ${dynPremium>0?'+':''}${dynPremium}，變化${dynPremChg>0?'+':''}${dynPremChg} → ${chgWord}`,isB?'偏多':'偏空',isB));
+  } else if(dynPremium!=null){
+    sentRows.push(sRow('價差',`${dynPremium>0?'正':'逆'}價差 ${dynPremium>0?'+':''}${dynPremium}，無前盤可比較`,'—',false));
+  } else { sentRows.push(sRow('價差','無資料','—',false)); }
+
+  // VIX
+  if(sent.vix!=null && dynVixChg!=null){
+    const isB=dynVixChg<0;
+    const arr=dynVixChg>0?'↑':'↓';
+    if(isB) bullVotes.push(1); else bearVotes.push(1);
+    sentRows.push(sRow('VIX',`${sent.vix} ${arr}（${dynVixChg>0?'+':''}${dynVixChg}）→ ${dynVixChg>0?'上升':'下降'}`,isB?'偏多':'偏空',isB));
+  } else if(sent.vix!=null){
+    sentRows.push(sRow('VIX',`${sent.vix}，無前盤可比較`,'—',false));
+  } else { sentRows.push(sRow('VIX','無資料','—',false)); }
+
+  // 量能
+  if(dynVolJudge){
+    const fArr=_fInc?'↑':'↓', tArr=_tInc?'↑':'↓';
+    const volCol=dynVolJudge==='趨勢推'?'#ff9800':dynVolJudge==='觀望盤'?'#555':'#4fc3f7';
+    sentRows.push(`<div style="display:flex;align-items:baseline;gap:6px;padding:5px 0;border-bottom:1px solid #131318">
+      <span style="color:#555;font-size:13px;width:36px;flex-shrink:0">量能</span>
+      <span style="color:#aaa;font-size:13px;flex:1">台指期 ${fArr} ｜ 加權 ${tArr}</span>
+      <span style="color:${volCol};font-size:13px;font-weight:600;width:52px;text-align:right">${dynVolJudge}</span>
+    </div>`);
+  } else { sentRows.push(sRow('量能','無資料（需填台指期量/加權量）','—',false)); }
+  const totalVotes = bullVotes.length + bearVotes.length;
+  let sentDir='—', sentCol='#aaa';
+  if(totalVotes>0){
+    if(bullVotes.length>bearVotes.length){ sentDir='偏多'; sentCol='#ff5252'; }
+    else if(bearVotes.length>bullVotes.length){ sentDir='偏空'; sentCol='#4fc3f7'; }
+    else { sentDir='中性'; sentCol='#ffb74d'; }
+  }
+  const contraNote = (sent.contradictionCount||0)>=1
+    ? `<span style="font-size:13px;color:#ff9800;margin-left:12px">矛盾 ${sent.contradictionCount} 個${sent.contradictionCount>=3?' ⚠️':''}</span>` : '';
+  const voteSummary = `<div style="margin-top:10px;padding-top:8px;border-top:1px solid #1e1e28;display:flex;align-items:center">
+    <span style="font-size:21px;font-weight:700;color:${sentCol}">${sentDir}</span>
+    <span style="font-size:13px;color:#555;margin-left:10px">${bullVotes.length} 多 ／ ${bearVotes.length} 空</span>
+    ${contraNote}
+  </div>`;
+  const sentHTML = `<div class="card"><h3>市場情緒判斷</h3><div style="margin-top:8px">${sentRows.join('')}</div>${voteSummary}</div>`;
+
+  out.innerHTML = `
+    <div class="card">
+      <h3>選擇權限制</h3>
+      <div style="margin-top:10px;line-height:2">${scLine}${spLine}</div>
+    </div>
+    ${contraHTML}
+    ${sentHTML}
+    <div class="card">
+      <h3>今日規劃摘要 <span style="font-size:12px;color:#555;font-weight:400">${t.slice(5).replace('-','/')} ${s}</span></h3>
+      <div style="margin-top:10px">${planBody}</div>
+    </div>
+  `;
 }
 
-function genAna() {
-  const rec = recs[0];
-  if(!rec){document.getElementById('ana-out').innerHTML='<div style="color:#ff5252;padding:14px;font-size:13px">請先在「數據」頁籤儲存今日數據</div>';return;}
-
-  const out=[], bull=['突破多','維持多'];
-  const sts=[rec.sox?.state,rec.tai?.state,rec.otc?.state];
-  const bullCnt=sts.filter(s=>bull.includes(s)).length;
-  const bearCnt=sts.filter(s=>['突破空','維持空'].includes(s)).length;
-  const brkBull=sts.filter(s=>s==='突破多').length;
-  const brkBear=sts.filter(s=>s==='突破空').length;
-
-  // 維度一
-  let d1='',d1s='neu';
-  if(bullCnt===3){d1s='bull';d1=`三指同向多\n費半：${rec.sox?.state} ｜ 加權：${rec.tai?.state} ｜ 櫃加：${rec.otc?.state}\n`;d1+=brkBull>=2?'多方力道極強，突破行情，⛔禁止SC。':'多方慣性延續，偏多操作。';}
-  else if(bearCnt===3){d1s='bear';d1=`三指同向空\n費半：${rec.sox?.state} ｜ 加權：${rec.tai?.state} ｜ 櫃加：${rec.otc?.state}\n`;d1+=brkBear>=2?'空方力道極強，突破行情，⛔禁止SP。':'空方慣性延續，偏空操作。';}
-  else{d1s='neu';d1=`三指方向不一\n費半：${rec.sox?.state||'—'} ｜ 加權：${rec.tai?.state||'—'} ｜ 櫃加：${rec.otc?.state||'—'}\n震盪盤，多空雙做：壓力空，支撐多。`;}
-  out.push({title:'▍ 維度一：多空位階',text:d1,sig:d1s});
-
-  // 維度二
-  let d2='';
-  if(selTrendVal){
-    const nx={強趨勢:'→ 等待雙巴（最高確定性反向訊號）',雙巴:'→ 進入穩趨勢（震盪整理）',穩趨勢:'→ 等待新一波強趨勢（方向未知）'};
-    const ac={強趨勢:'趨勢盤：5分8均跟抱，8均破才出。',雙巴:'雙巴後觀望，等穩趨勢選方向。',穩趨勢:'震盪盤：碰5分21均就出，不凹。'};
-    d2=`前一盤：${selTrendVal}\n${nx[selTrendVal]}\n\n操作：${ac[selTrendVal]}`;
-  } else d2='請在上方選擇前一盤趨勢形態。';
-  out.push({title:'▍ 維度二：趨勢三角形',text:d2,sig:'neu'});
-
-  // 維度三
-  const pd = document.getElementById('pd').value;
-  const ps = document.getElementById('ps').value;
-  let d3='',d3s='neu';
-  if(pd){
-    const mp={大漲:{心:'主力可能追高',判:'下一盤壓回洗盤/出貨',s:'bear'},小漲:{心:'多單小獲利',判:'繼續推高或震盪',s:'neu'},平盤:{心:'觀望',判:'等待方向',s:'neu'},小跌:{心:'空單小獲利',判:'繼續壓低或反彈',s:'neu'},大跌:{心:'多單被套',判:`${ps==='夜盤'?'早盤':'夜盤'}可能拉高出貨（主力解套）`,s:'bull'}};
-    const key=pd.replace(/（.*）/,'');
-    const m=Object.entries(mp).find(([k])=>pd.startsWith(k))?.[1];
-    if(m){d3s=m.s;d3=`${ps}${key}\n主力心態：${m.心}\n預判下一盤：${m.判}\n`;}
-  }
-  const mf=fib(rec.n?.h,rec.n?.l);
-  if(mf&&rec.n?.c){d3+=`\nM（主力成本）= ${mf.m.toLocaleString()}\n`;d3+=rec.n.c>mf.m?`收盤 ${rec.n.c} > M → M 轉支撐（掛多參考）`:`收盤 ${rec.n.c} < M → M 轉壓力（掛空參考）`;}
-  if(!d3) d3='請在上方選擇上一盤走勢方向。';
-  out.push({title:'▍ 維度三：主力思維',text:d3,sig:d3s});
-
-  // 維度四（from sent）
-  const s=rec.sent||{};
-  let d4='',d4s=s.contradictionCount>=2?'warn':'neu';
-  if(s.premium!=null) d4+=`正逆價差：${s.premium>0?'+':''}${s.premium}點（${s.premiumStatus||''}）\n`;
-  if(s.fnet!=null) d4+=`外資淨口數：${s.fnet>0?'+':''}${s.fnet}口\n`;
-  if(s.vix) d4+=`VIX：${s.vix}（${s.vix>25?'⚠️高波動':s.vix>20?'中度':'低波動'}）\n`;
-  d4+=`矛盾累積：${s.contradictionCount||0}個`;
-  if(s.premiumSwitch) d4+='\n⚠️ 正逆價差轉換，矛盾歸零！';
-  if(!s.premium&&!s.vix) d4='請先在「市場情緒」頁籤填入數據。';
-  out.push({title:'▍ 維度四：市場情緒',text:d4,sig:d4s});
-
-  // 信心
-  let conf=0;
-  if(bullCnt===3||bearCnt===3) conf++;
-  if(selTrendVal==='強趨勢') conf++;
-  if(pd&&!pd.startsWith('平盤')) conf++;
-  if((s.contradictionCount||0)===0) conf++;
-  const cm=[{t:'信心 0/4 → 不建議進場',c:'#555'},{t:'信心 1/4 → 掛最遠或觀望',c:'#90caf9'},{t:'信心 2/4 → 掛第二或第三個價位',c:'#ffb74d'},{t:'信心 3/4 → 掛第一或第二個價位',c:'#ff9800'},{t:'信心 4/4 → 最積極，掛第一壓力/支撐',c:'#ff5252'}];
-  out.push({title:'▍ 信心程度',text:cm[conf].t,sig:'neu',col:cm[conf].c});
-
-  // 掛單
-  const prods2=[{name:'台指近',d:rec.n},{name:'台指近全',d:rec.f},{name:'台指PM',d:rec.p}];
-  let longO=[],shortO=[];
-  prods2.forEach(({name,d})=>{
-    if(!d?.h||!d?.l) return;
-    const fb=fib(d.h,d.l); if(!fb) return;
-    const amp=d.h-d.l, cr=d.c||((d.h+d.l)/2), min=amp/3;
-    if(Math.abs(fb.s-cr)>=min) longO.push({lbl:`${name} S`,v:fb.s,dist:Math.round(Math.abs(fb.s-cr))});
-    if(Math.abs(fb.m-cr)>=min){if(cr>fb.m)shortO.push({lbl:`${name} M`,v:fb.m,dist:Math.round(Math.abs(fb.m-cr))});else longO.push({lbl:`${name} M`,v:fb.m,dist:Math.round(Math.abs(fb.m-cr))});}
-    if(Math.abs(fb.r-cr)>=min) shortO.push({lbl:`${name} R`,v:fb.r,dist:Math.round(Math.abs(fb.r-cr))});
-  });
-  longO.sort((a,b)=>b.v-a.v); shortO.sort((a,b)=>a.v-b.v);
-  const abc=['A（積極）','B（保守）','C（最保守）'];
-  let ord='';
-  if(bullCnt>=bearCnt&&longO.length){ord+='做多掛單（支撐/成本）：\n';longO.slice(0,3).forEach((o,i)=>ord+=`  ${abc[i]||''}. ${o.v.toLocaleString()} — ${o.lbl}，距${o.dist}點\n`);}
-  if(bearCnt>=bullCnt&&shortO.length){ord+='做空掛單（壓力/成本）：\n';shortO.slice(0,3).forEach((o,i)=>ord+=`  ${abc[i]||''}. ${o.v.toLocaleString()} — ${o.lbl}，距${o.dist}點\n`);}
-  if(!ord) ord='數據不足或方向不明，建議觀望。';
-  ord+='\n⚠️ 停損 50-100點，穿價即停損不凹';
-  out.push({title:'▍ 掛單建議',text:ord,sig:'neu'});
-
-  // 選擇權
-  let opt='',opts='neu';
-  if(brkBull>0){opt+='⛔ 突破多 → 禁止 SC（賣出買權）\n';opts='warn';}
-  if(brkBear>0){opt+='⛔ 突破空 → 禁止 SP（賣出賣權）\n';opts='warn';}
-  if(!brkBull&&!brkBear){
-    opt+='✅ 無突破，賣方可操作：\n';
-    if(s.vix>25) opt+=`  VIX ${s.vix}>25，權利金豐厚 ✓\n`;
-    else if(s.vix<20) opt+=`  VIX ${s.vix}<20，考慮買方或雙買\n`;
-    if(bullCnt===3) opt+='  三指同多 → 可 SP 收租（注意正逆價差安全距離）';
-    else if(bearCnt===3) opt+='  三指同空 → 可 SC 收租';
-    else opt+='  震盪盤 → 適合雙賣（SC+SP）';
-  }
-  if((s.contradictionCount||0)>=2){opt+=`\n\n⚠️ 矛盾${s.contradictionCount}個，考慮買方搏反轉`;opts='warn';}
-  out.push({title:'▍ 選擇權建議',text:opt,sig:opts});
-
-  const sc={bull:'sig-bull',bear:'sig-bear',warn:'sig-warn',neu:'sig-neu'};
-  document.getElementById('ana-out').innerHTML = out.map(o=>`
-    <div class="ana-title">${o.title}</div>
-    <div class="signal-box ${sc[o.sig]||'sig-neu'}" style="white-space:pre-line${o.col?';color:'+o.col:''}">${o.text}</div>
-  `).join('');
-}
 
 // ══════════════════════════════════════════
 // API FETCH
@@ -1483,13 +1822,46 @@ function importSeed() {
 }
 
 // ══════════════════════════════════════════
+// 解鎖編輯（Fix7）
+// ══════════════════════════════════════════
+function resetUnlockEdit() {
+  if (!_unlockEdit) return;
+  _unlockEdit = false;
+  const btn = document.getElementById('unlock-edit-btn');
+  if (btn) { btn.textContent='✏️ 解鎖編輯所有欄位'; btn.style.cssText=''; }
+}
+
+function toggleUnlockEdit() {
+  _unlockEdit = !_unlockEdit;
+  const btn = document.getElementById('unlock-edit-btn');
+  if (_unlockEdit) {
+    setFieldsLocked(['n','f','p','sox','tai','otc'], false, null);
+    btn.textContent = '🔒 重新套用鎖定';
+    btn.style.background = '#1a0808';
+    btn.style.color = '#ff5252';
+    btn.style.border = '1px solid rgba(255,82,82,.5)';
+  } else {
+    if (curSess === '早盤') {
+      setFieldsLocked(['n','f','tai','otc'], true, '昨日午盤');
+      setFieldsLocked(['p','sox'], false, null);
+    } else {
+      setFieldsLocked(['p','sox'], true, '今日早盤');
+      setFieldsLocked(['n','f','tai','otc'], false, null);
+    }
+    btn.textContent = '✏️ 解鎖編輯所有欄位';
+    btn.style.cssText = '';
+  }
+}
+
+// ══════════════════════════════════════════
 // TAB SWITCH
 // ══════════════════════════════════════════
 function switchTab(i) {
   document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',i===j));
   document.querySelectorAll('.pane').forEach((p,j)=>p.classList.toggle('active',i===j));
   if(i===1) loadSentRef();
-  if(i===2) { renderPrices(); updateHistSel(); }
+  if(i===2) { renderPrices(); updateHistSel(); renderPlanSection(); }
+  if(i===3) renderConfirm();
 }
 
 // ══════════════════════════════════════════
@@ -1551,6 +1923,8 @@ function setupAutoAdvance() {
 // INIT
 // ══════════════════════════════════════════
 load();
+loadPlans();
+cleanGhostRecs(); // 清除空白幽靈記錄（Fix4）
 initFirebase();
 
 // Set today's date in picker

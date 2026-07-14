@@ -1627,18 +1627,31 @@ function renderConfirm() {
 
   const t = _planDate || getWorkDate();
   const s = _planSess || curSess;
-  const rec = recs.find(r => r.date === t) || recs[0];
-  const sent = rec?.sent || {};
+  // rec 用於多空狀態顯示（找當日記錄）
+  const rec = recs.find(r => r.date === t && r.session === s)
+           || recs.find(r => r.date === t)
+           || recs[0];
   const p = getPlan(t, s);
 
-  // 找前一筆 rec，動態補算歷史資料沒有儲存的欄位
+  // sentRec：找當日真正有情緒資料的那筆（可能在不同 session）
+  const hasSentData = r => r?.sent && (r.sent.fnet != null || r.sent.vix != null || r.sent.fvol != null || r.sent.premium != null);
+  const todayRecs = recs.filter(r => r.date === t);
+  const sentRec = todayRecs.find(r => r.session === s && hasSentData(r))
+               || todayRecs.find(r => hasSentData(r))
+               || todayRecs.find(r => r.session === s)
+               || todayRecs[0]
+               || recs[0];
+  const sent = sentRec?.sent || {};
+
+  // prevSentRec：找前一筆有情緒資料的記錄（用於比對）
   const prevSentRec = [...recs]
-    .filter(r => r.date < rec?.date || (r.date === rec?.date && r.session === '早盤' && rec?.session === '午盤'))
+    .filter(r => hasSentData(r) && (r.date < (sentRec?.date||t) || (r.date === (sentRec?.date||t) && r.session === '早盤' && sentRec?.session === '午盤')))
     .sort((a,b) => b.date.localeCompare(a.date)||(b.session==='午盤'?1:-1))[0];
   const prevSent = prevSentRec?.sent || {};
-  // Premium（從價格資料動態算，若 sent 沒有）
-  const _txfC = rec?.n?.c || rec?.f?.c || rec?.p?.c;
-  const _taiC = rec?.tai?.c;
+
+  // 動態補算 premium（從 OHLC 算，若 sent 沒有儲存）
+  const _txfC = sentRec?.n?.c || sentRec?.f?.c || sentRec?.p?.c;
+  const _taiC = sentRec?.tai?.c;
   const dynPremium = sent.premium ?? ((_txfC && _taiC) ? Math.round(_txfC - _taiC + (sent.evaporation||0)) : null);
   const _ptxf = prevSentRec?.n?.c || prevSentRec?.f?.c || prevSentRec?.p?.c;
   const _ptai = prevSentRec?.tai?.c;

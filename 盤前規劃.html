@@ -384,6 +384,29 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
 <!-- ══════════ TAB 3: 交易前確認 ══════════ -->
 <div class="pane" id="tab3">
+  <div class="card" id="adhoc-card">
+    <h3>臨機應變價位計算</h3>
+    <div class="row2" style="margin-top:10px">
+      <div class="ig"><span class="lbl">高</span><input type="number" id="ah-h" oninput="calcAdHoc()" placeholder="—"></div>
+      <div class="ig"><span class="lbl">低</span><input type="number" id="ah-l" oninput="calcAdHoc()" placeholder="—"></div>
+    </div>
+    <div id="ah-result" style="margin-top:12px;display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+        <div style="background:#131318;border-radius:8px;padding:10px">
+          <div style="font-size:12px;color:#ff5252;margin-bottom:4px">壓力</div>
+          <div id="ah-r" style="font-size:20px;font-weight:700;color:#ffd54f">—</div>
+        </div>
+        <div style="background:#131318;border-radius:8px;padding:10px">
+          <div style="font-size:12px;color:#ffb74d;margin-bottom:4px">主力成本</div>
+          <div id="ah-m" style="font-size:20px;font-weight:700;color:#ffd54f">—</div>
+        </div>
+        <div style="background:#131318;border-radius:8px;padding:10px">
+          <div style="font-size:12px;color:#69f0ae;margin-bottom:4px">支撐</div>
+          <div id="ah-s" style="font-size:20px;font-weight:700;color:#ffd54f">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div id="confirm-out" style="display:flex;flex-direction:column;gap:12px"></div>
 </div>
 
@@ -1614,11 +1637,29 @@ function renderTab2(rec) {
 function renderPriceRef(rec) {
   const body = document.getElementById('price-ref-body');
   if (!body) return;
-  if (!rec?.n?.h || !rec?.n?.l) { body.innerHTML = '<span style="color:#444">數據不足</span>'; return; }
-  const amp = Math.round(rec.n.h - rec.n.l);
-  const close = rec.n.c;
+  // 早盤用夜盤(p)收盤，午盤用日盤(n)收盤
+  const data = (rec?.session === '早盤') ? rec?.p : rec?.n;
+  if (!data?.h || !data?.l) { body.innerHTML = '<span style="color:#444">數據不足</span>'; return; }
+  const amp = Math.round(data.h - data.l);
+  const close = data.c;
   const closeDisp = close != null ? close.toLocaleString() : '—';
   body.innerHTML = `<span style="color:#888;font-size:13px">收盤</span> <span style="color:#e0e0e0;font-size:16px;font-weight:600">${closeDisp}</span><span style="color:#444;margin:0 10px">｜</span><span style="color:#888;font-size:13px">振幅</span> <span style="color:#e0e0e0;font-size:16px;font-weight:600">${amp}pt</span>`;
+}
+
+// ══════════════════════════════════════════
+// TAB 3: 臨機應變計算
+// ══════════════════════════════════════════
+function calcAdHoc() {
+  const h = parseFloat(document.getElementById('ah-h').value);
+  const l = parseFloat(document.getElementById('ah-l').value);
+  const res = document.getElementById('ah-result');
+  if (!h || !l || h <= l) { res.style.display = 'none'; return; }
+  const fb = fib(h, l);
+  if (!fb) { res.style.display = 'none'; return; }
+  document.getElementById('ah-r').textContent = fb.r.toLocaleString();
+  document.getElementById('ah-m').textContent = fb.m.toLocaleString();
+  document.getElementById('ah-s').textContent = fb.s.toLocaleString();
+  res.style.display = 'block';
 }
 
 // ══════════════════════════════════════════
@@ -1722,10 +1763,13 @@ function renderConfirm() {
   // 正逆價差
   if(dynPremium!=null && dynPremChg!=null){
     const pType=dynPremium>0?'正價差':'逆價差';
-    const isB=dynPremChg<0;
+    // 正價差=不利多=偏空，逆價差=不利空=偏多，收斂只影響力道強弱，不改變方向
+    const isB=dynPremium<0;
     const chgWord=dynPremium>0?(dynPremChg>0?'擴散':'收斂'):(dynPremChg<0?'擴散':'收斂');
+    const isConverge=(dynPremium>0&&dynPremChg<0)||(dynPremium<0&&dynPremChg>0);
+    const strength=isConverge?'（力道偏弱）':'';
     if(isB) bullVotes.push(1); else bearVotes.push(1);
-    sentRows.push(sRow('價差',`${pType} ${dynPremium>0?'+':''}${dynPremium}，變化${dynPremChg>0?'+':''}${dynPremChg} → ${chgWord}`,isB?'偏多':'偏空',isB));
+    sentRows.push(sRow('價差',`${pType} ${dynPremium>0?'+':''}${dynPremium}，變化${dynPremChg>0?'+':''}${dynPremChg} → ${chgWord}${strength}`,isB?'偏多':'偏空',isB));
   } else if(dynPremium!=null){
     sentRows.push(sRow('價差',`${dynPremium>0?'正':'逆'}價差 ${dynPremium>0?'+':''}${dynPremium}，無前盤可比較`,'—',false));
   } else { sentRows.push(sRow('價差','無資料','—',false)); }

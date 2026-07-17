@@ -1713,12 +1713,14 @@ function renderConfirm() {
   // 選擇權限制
   const sts = [rec?.sox?.state, rec?.tai?.state, rec?.otc?.state];
   const brkBull = sts.filter(x => x==='突破多').length;
+  const mntBull = sts.filter(x => x==='維持多').length;
   const brkBear = sts.filter(x => x==='突破空').length;
-  const scLine = brkBull > 0
-    ? `<div style="color:#ff5252;font-size:15px">⛔ 禁止 SC（賣出買權）</div><div style="color:#555;font-size:12px;margin-left:2px;margin-bottom:4px">突破多 × ${brkBull}</div>`
+  const mntBear = sts.filter(x => x==='維持空').length;
+  const scLine = (brkBull > 0 || mntBull > 0)
+    ? `<div style="color:#ff5252;font-size:15px">⛔ 禁止 SC（賣出買權）</div><div style="color:#555;font-size:12px;margin-left:2px;margin-bottom:4px">${brkBull>0?'突破多 × '+brkBull:''}${brkBull>0&&mntBull>0?' ':''}${mntBull>0?'維持多 × '+mntBull:''}</div>`
     : `<div style="color:#69f0ae;font-size:15px">✅ SC 可操作</div>`;
-  const spLine = brkBear > 0
-    ? `<div style="color:#ff5252;font-size:15px">⛔ 禁止 SP（賣出賣權）</div><div style="color:#555;font-size:12px;margin-left:2px;margin-bottom:4px">突破空 × ${brkBear}</div>`
+  const spLine = (brkBear > 0 || mntBear > 0)
+    ? `<div style="color:#ff5252;font-size:15px">⛔ 禁止 SP（賣出賣權）</div><div style="color:#555;font-size:12px;margin-left:2px;margin-bottom:4px">${brkBear>0?'突破空 × '+brkBear:''}${brkBear>0&&mntBear>0?' ':''}${mntBear>0?'維持空 × '+mntBear:''}</div>`
     : `<div style="color:#69f0ae;font-size:15px">✅ SP 可操作</div>`;
 
   // 矛盾警示

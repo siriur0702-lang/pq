@@ -13,7 +13,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0f0f13;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh}
 .tab-bar{display:flex;background:#13131a;border-bottom:1px solid #222;position:sticky;top:0;z-index:100}
-.tab-btn{flex:1;padding:12px 2px;font-size:14px;color:#555;background:none;border:none;cursor:pointer;touch-action:manipulation;border-bottom:2px solid transparent}
+.tab-btn{flex:1;padding:12px 2px;font-size:12px;color:#555;background:none;border:none;cursor:pointer;touch-action:manipulation;border-bottom:2px solid transparent}
 .tab-btn.active{color:#4fc3f7;border-bottom-color:#4fc3f7}
 .pane{display:none;padding:12px 12px 90px}
 .pane.active{display:block}
@@ -93,6 +93,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <button class="tab-btn" onclick="switchTab(1)">📈 市場情緒</button>
   <button class="tab-btn" onclick="switchTab(2)">📋 盤前記錄</button>
   <button class="tab-btn" onclick="switchTab(3)">✅ 交易前確認</button>
+  <button class="tab-btn" onclick="switchTab(4)">📒 紀錄</button>
 </div>
 
 <!-- ══════════ TAB 0: 數據 ══════════ -->
@@ -410,6 +411,26 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div id="confirm-out" style="display:flex;flex-direction:column;gap:12px"></div>
 </div>
 
+<!-- ══════════ TAB 4: 交易紀錄 ══════════ -->
+<div class="pane" id="tab4">
+  <!-- 子頁籤 -->
+  <div style="display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid #222">
+    <button id="tsub-0" onclick="switchTradeTab('futures')" style="flex:1;padding:10px 4px;font-size:14px;font-weight:600;color:#4fc3f7;background:none;border:none;border-bottom:2px solid #4fc3f7;cursor:pointer;touch-action:manipulation">期貨</button>
+    <button id="tsub-1" onclick="switchTradeTab('options')" style="flex:1;padding:10px 4px;font-size:14px;font-weight:600;color:#555;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;touch-action:manipulation">收租</button>
+  </div>
+  <!-- 月份導航 -->
+  <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:0 0 10px">
+    <button onclick="tradeMonthNav(-1)" style="background:none;border:none;color:#4fc3f7;font-size:22px;cursor:pointer;padding:4px 12px;touch-action:manipulation">◀</button>
+    <span id="trade-month-label" style="font-size:16px;font-weight:600;color:#e0e0e0;min-width:120px;text-align:center"></span>
+    <button onclick="tradeMonthNav(1)" style="background:none;border:none;color:#4fc3f7;font-size:22px;cursor:pointer;padding:4px 12px;touch-action:manipulation">▶</button>
+  </div>
+  <div class="card" id="trade-stats"></div>
+  <div id="trade-list" style="margin-bottom:80px"></div>
+  <div style="position:fixed;bottom:0;left:0;right:0;padding:12px;background:#0f0f13;border-top:1px solid #1e1e28;z-index:50">
+    <button class="btn btn-blue" style="margin:0" onclick="openTradeModal(null)">＋ 新增交易紀錄</button>
+  </div>
+</div>
+
 <!-- 狀態選單（浮動） -->
 <div id="state-picker" style="display:none;position:fixed;z-index:999;background:#1e1e2a;border:1px solid #333;border-radius:12px;padding:12px;box-shadow:0 8px 32px #000a">
   <div style="font-size:11px;color:#555;margin-bottom:10px" id="sp-title">修改狀態</div>
@@ -422,8 +443,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 // ══════════════════════════════════════════
 // STORAGE
 // ══════════════════════════════════════════
-const RK = 'txf_recs_v1', SK = 'txf_states_v1', PK = 'txf_plans_v1';
-let recs = [], sth = {}, plans = {};
+const RK = 'txf_recs_v1', SK = 'txf_states_v1', PK = 'txf_plans_v1', TK = 'txf_trades_v1';
+let recs = [], sth = {}, plans = {}, trades = [];
 let curSess = '早盤';
 let _planTrend = null;
 let _unlockEdit = false;
@@ -469,6 +490,14 @@ function savePlans() {
   localStorage.setItem(PK, JSON.stringify(plans));
   syncToFirebase();
 }
+function loadTrades() {
+  try { trades = JSON.parse(localStorage.getItem(TK) || '[]'); } catch(e) { trades = []; }
+}
+function saveTrades() {
+  localStorage.setItem(TK, JSON.stringify(trades));
+  syncToFirebase();
+}
+function genTradeId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
 // ══════════════════════════════════════════
 // 盤前規劃 PLAN
@@ -632,6 +661,7 @@ function startFirebaseSync() {
       recs = data.recs || [];
       sth = data.sth || {};
       if (data.plans) { plans = data.plans; localStorage.setItem(PK, JSON.stringify(plans)); }
+      if (data.trades) { trades = data.trades; localStorage.setItem(TK, JSON.stringify(trades)); }
       localStorage.setItem(RK, JSON.stringify(recs));
       localStorage.setItem(SK, JSON.stringify(sth));
       renderHist(); updateHistSel();
@@ -649,7 +679,7 @@ function syncToFirebase() {
   _syncTimer = setTimeout(() => {
     _isFbWriting = true;
     setSyncStatus('saving');
-    fbDb.ref('data/' + syncKey).set({ recs, sth, plans })
+    fbDb.ref('data/' + syncKey).set({ recs, sth, plans, trades })
       .then(() => { setSyncStatus('synced'); setTimeout(() => { _isFbWriting = false; }, 500); })
       .catch(() => { setSyncStatus('error'); _isFbWriting = false; });
   }, 600);
@@ -1922,6 +1952,409 @@ function toggleUnlockEdit() {
 }
 
 // ══════════════════════════════════════════
+// TAB 4: 交易紀錄
+// ══════════════════════════════════════════
+let _tradeMonth = '', _editTradeId = null, _tradeEntries = [], _tradeExits = [], _tradeTab = 'futures';
+
+function switchTradeTab(type) {
+  _tradeTab = type;
+  const isFut = type === 'futures';
+  document.getElementById('tsub-0').style.color = isFut ? '#4fc3f7' : '#555';
+  document.getElementById('tsub-0').style.borderBottomColor = isFut ? '#4fc3f7' : 'transparent';
+  document.getElementById('tsub-1').style.color = isFut ? '#555' : '#4fc3f7';
+  document.getElementById('tsub-1').style.borderBottomColor = isFut ? 'transparent' : '#4fc3f7';
+  renderTrades();
+}
+
+function tradeMonthNav(dir) {
+  const [y, m] = _tradeMonth.split('-').map(Number);
+  const d = new Date(y, m - 1 + dir, 1);
+  _tradeMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  renderTrades();
+}
+
+function renderTrades() {
+  if (!_tradeMonth) _tradeMonth = today().slice(0, 7);
+  document.getElementById('trade-month-label').textContent = _tradeMonth.slice(0, 4) + ' 年 ' + parseInt(_tradeMonth.slice(5)) + ' 月';
+  const mt = trades.filter(t => t.date.startsWith(_tradeMonth) && t.type === _tradeTab);
+  renderTradeStats(mt);
+  renderTradeList(mt);
+}
+
+function renderTradeStats(mt) {
+  if (_tradeTab === 'options') {
+    const win = mt.filter(t => t.optResult === '全賺').length;
+    const part = mt.filter(t => t.optResult === '部分').length;
+    const loss = mt.filter(t => t.optResult === '吃損').length;
+    const total = mt.length;
+    const winRate = total ? Math.round(win / total * 100) : null;
+    document.getElementById('trade-stats').innerHTML = `
+      <h3>本月收租統計</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0 10px">
+        <div style="background:#131318;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:12px;color:#69f0ae;margin-bottom:4px">全賺</div>
+          <div style="font-size:22px;font-weight:700">${win}</div>
+        </div>
+        <div style="background:#131318;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:12px;color:#aaa;margin-bottom:4px">部分</div>
+          <div style="font-size:22px;font-weight:700">${part}</div>
+        </div>
+        <div style="background:#131318;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:12px;color:#ff5252;margin-bottom:4px">吃損</div>
+          <div style="font-size:22px;font-weight:700">${loss}</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#555">全賺率 <b style="color:#e0e0e0">${winRate !== null ? winRate + '%' : '—'}</b></div>`;
+    return;
+  }
+  const totalPts = mt.reduce((s, t) => s + (t.totalPts || 0), 0);
+  const wins = mt.filter(t => t.result === '獲利').length;
+  const be = mt.filter(t => t.result === '保本').length;
+  const loss = mt.filter(t => t.result === '吃損').length;
+  const total = mt.length;
+  const winRate = total ? Math.round(wins / total * 100) : null;
+  const trend = mt.filter(t => t.trend === '順勢');
+  const counter = mt.filter(t => t.trend === '逆勢');
+  const tWR = trend.length ? Math.round(trend.filter(t => t.result === '獲利').length / trend.length * 100) : null;
+  const cWR = counter.length ? Math.round(counter.filter(t => t.result === '獲利').length / counter.length * 100) : null;
+  const ptsCol = totalPts > 0 ? '#69f0ae' : totalPts < 0 ? '#ff5252' : '#aaa';
+  document.getElementById('trade-stats').innerHTML = `
+    <h3>本月績效</h3>
+    <div style="font-size:36px;font-weight:700;color:${ptsCol};margin:8px 0 12px">${totalPts > 0 ? '+' : ''}${totalPts} 點</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+      <div style="background:#131318;border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:12px;color:#69f0ae;margin-bottom:4px">獲利</div>
+        <div style="font-size:22px;font-weight:700">${wins}</div>
+      </div>
+      <div style="background:#131318;border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:12px;color:#aaa;margin-bottom:4px">保本</div>
+        <div style="font-size:22px;font-weight:700">${be}</div>
+      </div>
+      <div style="background:#131318;border-radius:8px;padding:10px;text-align:center">
+        <div style="font-size:12px;color:#ff5252;margin-bottom:4px">吃損</div>
+        <div style="font-size:22px;font-weight:700">${loss}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px">
+      <span style="color:#555">勝率 <b style="color:#e0e0e0">${winRate !== null ? winRate + '%' : '—'}</b></span>
+      ${tWR !== null ? `<span style="color:#555">順勢 <b style="color:#4fc3f7">${tWR}%</b></span>` : ''}
+      ${cWR !== null ? `<span style="color:#555">逆勢 <b style="color:#ffb74d">${cWR}%</b></span>` : ''}
+    </div>`;
+}
+
+function renderTradeList(mt) {
+  const el = document.getElementById('trade-list');
+  if (!mt.length) { el.innerHTML = '<div style="text-align:center;color:#444;padding:40px 0;font-size:14px">本月尚無交易紀錄</div>'; return; }
+  const sorted = [...mt].sort((a, b) => b.date.localeCompare(a.date) || (b.session === '午盤' ? 1 : -1));
+  const grouped = {};
+  sorted.forEach(t => { if (!grouped[t.date]) grouped[t.date] = []; grouped[t.date].push(t); });
+  el.innerHTML = Object.entries(grouped).map(([date, items]) =>
+    `<div style="margin-bottom:12px">
+      <div style="font-size:12px;color:#555;margin:10px 0 6px;padding-left:2px">${date.slice(5).replace('-', '/')}</div>
+      ${items.map(t => renderTradeItem(t)).join('')}
+    </div>`).join('');
+}
+
+function renderTradeItem(t) {
+  if (t.type === 'options') {
+    const rc = t.optResult === '全賺' ? '#69f0ae' : t.optResult === '吃損' ? '#ff5252' : '#aaa';
+    return `<div class="hist-item" onclick="openTradeModal('${t.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:13px;color:#555">${t.session}</span>
+          <span style="font-size:14px;font-weight:700;color:#90caf9">${t.optDir || '—'}</span>
+          <span style="font-size:13px;color:#aaa">${t.strike ? t.strike.toLocaleString() : '—'}</span>
+        </div>
+        <span style="font-size:14px;font-weight:600;color:${rc}">${t.optResult || '—'}</span>
+      </div>
+      ${t.premium ? `<div style="margin-top:4px;font-size:12px;color:#555">權利金 ${t.premium}</div>` : ''}
+    </div>`;
+  }
+  const ptsCol = (t.totalPts || 0) > 0 ? '#69f0ae' : (t.totalPts || 0) < 0 ? '#ff5252' : '#aaa';
+  const rc = t.result === '獲利' ? '#69f0ae' : t.result === '吃損' ? '#ff5252' : '#aaa';
+  const tc = t.trend === '順勢' ? '#4fc3f7' : '#ffb74d';
+  const exitStr = t.exits && t.exits.length ? t.exits.map(e => (e.price ? e.price.toLocaleString() : '?') + (e.lots > 1 ? `×${e.lots}` : '')).join('、') : '—';
+  return `<div class="hist-item" onclick="openTradeModal('${t.id}')">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:13px;color:#555">${t.session}</span>
+        <span class="badge ${t.dir === '多' ? 'b-突破多' : 'b-突破空'}" style="font-size:12px;padding:2px 7px">${t.dir || '—'}</span>
+        <span style="font-size:12px;color:${tc}">${t.trend || ''}</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:16px;font-weight:700;color:${ptsCol}">${(t.totalPts || 0) > 0 ? '+' : ''}${t.totalPts || 0}</div>
+        <div style="font-size:11px;color:${rc}">${t.result || '—'}</div>
+      </div>
+    </div>
+    <div style="margin-top:6px;font-size:12px;color:#555">進 ${t.entries && t.entries.length ? t.entries.map(e => e.price.toLocaleString() + (e.lots > 1 ? '×' + e.lots : '')).join('、') : (t.entryPrice ? t.entryPrice.toLocaleString() : '—')} → 出 ${exitStr}</div>
+  </div>`;
+}
+
+function openTradeModal(id) {
+  _editTradeId = id || null;
+  const t = id ? trades.find(x => x.id === id) : null;
+  // 舊資料若只有 entryPrice，轉換成 entries 陣列
+  const existingEntries = t && t.entries ? t.entries : (t && t.entryPrice ? [{price: t.entryPrice, lots: 1}] : null);
+  _tradeEntries = existingEntries ? JSON.parse(JSON.stringify(existingEntries)) : [{price: '', lots: 1}];
+  _tradeExits = t && t.exits ? JSON.parse(JSON.stringify(t.exits)) : [{price: '', lots: 1}];
+  document.getElementById('trade-overlay').style.display = 'block';
+  document.getElementById('trade-panel').style.display = 'block';
+  renderTradeModalContent(t, t ? null : _tradeTab);
+}
+function closeTradeModal() {
+  document.getElementById('trade-overlay').style.display = 'none';
+  document.getElementById('trade-panel').style.display = 'none';
+  _editTradeId = null; _tradeEntries = []; _tradeExits = [];
+}
+function renderTradeModalContent(t, defaultType) {
+  const isOpt = (t && t.type === 'options') || defaultType === 'options';
+  document.getElementById('trade-panel').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3>${t ? '編輯' : '新增'}交易紀錄</h3>
+      <span style="color:#555;font-size:24px;cursor:pointer;line-height:1;touch-action:manipulation" onclick="closeTradeModal()">✕</span>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="sub">類型</div>
+      <div class="chips">
+        <div class="chip${!isOpt ? ' sel' : ''}" id="tr-type-fut" onclick="switchTradeType('futures')">期貨</div>
+        <div class="chip${isOpt ? ' sel' : ''}" id="tr-type-opt" onclick="switchTradeType('options')">收租</div>
+      </div>
+    </div>
+    <div class="row2" style="margin-bottom:14px">
+      <div class="ig">
+        <span class="lbl">日期</span>
+        <input type="date" id="tr-date" value="${t && t.date ? t.date : today()}" onchange="tradeAutoFillEntry()">
+      </div>
+      <div class="ig">
+        <span class="lbl">盤別</span>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <div class="chip${!t || t.session === '早盤' ? ' sel' : ''}" id="tr-sess-0" onclick="selectTradeSess('早盤')" style="padding:6px 12px">早盤</div>
+          <div class="chip${t && t.session === '午盤' ? ' sel' : ''}" id="tr-sess-1" onclick="selectTradeSess('午盤')" style="padding:6px 12px">午盤</div>
+        </div>
+      </div>
+    </div>
+    <div id="tr-fut" style="display:${isOpt ? 'none' : 'block'}">
+      <div style="margin-bottom:14px">
+        <div class="sub">方向</div>
+        <div class="chips" id="tr-dir-chips">
+          <div class="chip${t && t.dir === '多' ? ' sel' : ''}" onclick="selChipGroup('tr-dir-chips',this);tradeAutoFillEntry()">多</div>
+          <div class="chip${t && t.dir === '空' ? ' sel' : ''}" onclick="selChipGroup('tr-dir-chips',this);tradeAutoFillEntry()">空</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="sub">上一盤狀態</div>
+        <div class="chips" id="tr-prevtrend-chips">
+          <div class="chip${t && t.prevTrend === '強趨勢' ? ' sel' : ''}" onclick="selChipGroup('tr-prevtrend-chips',this)">強趨勢</div>
+          <div class="chip${t && t.prevTrend === '雙巴' ? ' sel' : ''}" onclick="selChipGroup('tr-prevtrend-chips',this)">雙巴</div>
+          <div class="chip${t && t.prevTrend === '穩趨勢' ? ' sel' : ''}" onclick="selChipGroup('tr-prevtrend-chips',this)">穩趨勢</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="sub">順逆勢</div>
+        <div class="chips" id="tr-trend-chips">
+          <div class="chip${t && t.trend === '順勢' ? ' sel' : ''}" onclick="selChipGroup('tr-trend-chips',this)">順勢</div>
+          <div class="chip${t && t.trend === '逆勢' ? ' sel' : ''}" onclick="selChipGroup('tr-trend-chips',this)">逆勢</div>
+        </div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div class="sub">進場紀錄</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <button onclick="addEntryFromPlan('R')" style="flex:1;padding:7px 4px;border-radius:6px;border:1px solid rgba(255,82,82,.4);background:rgba(255,82,82,.08);color:#ff5252;font-size:13px;cursor:pointer;touch-action:manipulation">＋壓力</button>
+          <button onclick="addEntryFromPlan('S')" style="flex:1;padding:7px 4px;border-radius:6px;border:1px solid rgba(105,240,174,.4);background:rgba(105,240,174,.08);color:#69f0ae;font-size:13px;cursor:pointer;touch-action:manipulation">＋支撐</button>
+        </div>
+        <div id="tr-entries-list"></div>
+        <div style="color:#4fc3f7;font-size:14px;cursor:pointer;padding:4px 0 8px;touch-action:manipulation" onclick="addTradeEntry()">＋ 手動新增進場</div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div class="sub">出場紀錄</div>
+        <div id="tr-exits-list"></div>
+        <div style="color:#4fc3f7;font-size:14px;cursor:pointer;padding:8px 0;touch-action:manipulation" onclick="addTradeExit()">＋ 新增出場</div>
+      </div>
+      <div id="tr-calc" style="padding:12px;background:#131318;border-radius:8px;margin-bottom:12px;display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:#555;font-size:13px">合計點數</span>
+          <span id="tr-calc-pts" style="font-weight:700;font-size:20px"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+          <span style="color:#555;font-size:13px">結果</span>
+          <span id="tr-calc-result" style="font-weight:600;font-size:14px"></span>
+        </div>
+      </div>
+    </div>
+    <div id="tr-opt" style="display:${isOpt ? 'block' : 'none'}">
+      <div style="margin-bottom:14px">
+        <div class="sub">方向</div>
+        <div class="chips" id="tr-optdir-chips">
+          <div class="chip${t && t.optDir === 'SP' ? ' sel' : ''}" onclick="selChipGroup('tr-optdir-chips',this)">SP</div>
+          <div class="chip${t && t.optDir === 'SC' ? ' sel' : ''}" onclick="selChipGroup('tr-optdir-chips',this)">SC</div>
+        </div>
+      </div>
+      <div class="row2" style="margin-bottom:14px">
+        <div class="ig"><span class="lbl">履約價</span><input type="number" id="tr-strike" value="${t && t.strike ? t.strike : ''}" placeholder="—"></div>
+        <div class="ig"><span class="lbl">收到權利金</span><input type="number" id="tr-premium" value="${t && t.premium ? t.premium : ''}" placeholder="—"></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="sub">結果</div>
+        <div class="chips" id="tr-optresult-chips">
+          <div class="chip${t && t.optResult === '全賺' ? ' sel' : ''}" onclick="selChipGroup('tr-optresult-chips',this)">全賺</div>
+          <div class="chip${t && t.optResult === '部分' ? ' sel' : ''}" onclick="selChipGroup('tr-optresult-chips',this)">部分</div>
+          <div class="chip${t && t.optResult === '吃損' ? ' sel' : ''}" onclick="selChipGroup('tr-optresult-chips',this)">吃損</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;padding-bottom:16px">
+      <button class="btn btn-blue" style="margin:0" onclick="saveTrade()">儲存</button>
+      ${t ? `<button class="btn btn-gray" style="margin:0;flex:0 0 auto;padding:13px 16px;touch-action:manipulation" onclick="confirmDeleteTrade('${t.id}')">刪除</button>` : ''}
+    </div>`;
+  renderTradeEntries();
+  renderTradeExits();
+  if (!t) tradeAutoFillPrevTrend();
+}
+
+function selChipGroup(groupId, el) {
+  document.querySelectorAll('#' + groupId + ' .chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function getChipSel(groupId) {
+  const sel = document.querySelector('#' + groupId + ' .chip.sel');
+  return sel ? sel.textContent.trim() : null;
+}
+function switchTradeType(type) {
+  document.getElementById('tr-type-fut').classList.toggle('sel', type === 'futures');
+  document.getElementById('tr-type-opt').classList.toggle('sel', type === 'options');
+  document.getElementById('tr-fut').style.display = type === 'futures' ? 'block' : 'none';
+  document.getElementById('tr-opt').style.display = type === 'options' ? 'block' : 'none';
+}
+function selectTradeSess(s) {
+  document.getElementById('tr-sess-0').classList.toggle('sel', s === '早盤');
+  document.getElementById('tr-sess-1').classList.toggle('sel', s === '午盤');
+  tradeAutoFillEntry();
+  tradeAutoFillPrevTrend();
+}
+function addEntryFromPlan(which) {
+  const date = document.getElementById('tr-date') ? document.getElementById('tr-date').value : today();
+  const sess = document.getElementById('tr-sess-0') && document.getElementById('tr-sess-0').classList.contains('sel') ? '早盤' : '午盤';
+  const p = getPlan(date, sess);
+  const val = which === 'R' ? p.targetR : p.targetS;
+  if (!val) { alert('此盤尚未設定' + (which === 'R' ? '壓力' : '支撐') + '目標'); return; }
+  if (_tradeEntries.length === 1 && !_tradeEntries[0].price) {
+    _tradeEntries[0].price = val;
+  } else {
+    _tradeEntries.push({price: val, lots: 1});
+  }
+  renderTradeEntries();
+}
+function addTradeEntry() { _tradeEntries.push({price: '', lots: 1}); renderTradeEntries(); }
+function removeTradeEntry(i) { if (_tradeEntries.length <= 1) return; _tradeEntries.splice(i, 1); renderTradeEntries(); }
+function updateEntryVal(i, key, val) {
+  _tradeEntries[i][key] = key === 'lots' ? (parseInt(val) || 1) : (parseFloat(val) || '');
+  updateTradeCalc();
+}
+function renderTradeEntries() {
+  const el = document.getElementById('tr-entries-list');
+  if (!el) return;
+  el.innerHTML = _tradeEntries.map((en, i) => `
+    <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+      <div class="ig" style="flex:2">
+        ${i === 0 ? '<span class="lbl">點位</span>' : ''}
+        <input type="number" value="${en.price || ''}" placeholder="—" oninput="updateEntryVal(${i},'price',this.value)" style="font-size:16px">
+      </div>
+      <div class="ig" style="flex:1">
+        ${i === 0 ? '<span class="lbl">口數</span>' : ''}
+        <input type="number" value="${en.lots || 1}" min="1" oninput="updateEntryVal(${i},'lots',this.value)" style="font-size:16px">
+      </div>
+      <div style="${i === 0 ? 'margin-top:18px' : ''};color:#555;font-size:20px;padding:0 4px;line-height:1;${_tradeEntries.length > 1 ? 'cursor:pointer;touch-action:manipulation' : 'visibility:hidden'}" onclick="removeTradeEntry(${i})">✕</div>
+    </div>`).join('');
+  updateTradeCalc();
+}
+function tradeAutoFillPrevTrend() {
+  const date = document.getElementById('tr-date') ? document.getElementById('tr-date').value : today();
+  const sess = document.getElementById('tr-sess-0') && document.getElementById('tr-sess-0').classList.contains('sel') ? '早盤' : '午盤';
+  const p = getPlan(date, sess);
+  document.querySelectorAll('#tr-prevtrend-chips .chip').forEach(c => {
+    c.classList.toggle('sel', !!p.trend && c.textContent.trim() === p.trend);
+  });
+}
+function tradeAutoFillEntry() {} // 保留空函數避免舊呼叫報錯
+function renderTradeExits() {
+  const el = document.getElementById('tr-exits-list');
+  if (!el) return;
+  el.innerHTML = _tradeExits.map((ex, i) => `
+    <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+      <div class="ig" style="flex:2">
+        ${i === 0 ? '<span class="lbl">出場點位</span>' : ''}
+        <input type="number" value="${ex.price || ''}" placeholder="—" oninput="updateExitVal(${i},'price',this.value)" style="font-size:16px">
+      </div>
+      <div class="ig" style="flex:1">
+        ${i === 0 ? '<span class="lbl">口數</span>' : ''}
+        <input type="number" value="${ex.lots || 1}" min="1" oninput="updateExitVal(${i},'lots',this.value)" style="font-size:16px">
+      </div>
+      <div style="${i === 0 ? 'margin-top:18px' : ''};color:#555;font-size:20px;padding:0 4px;line-height:1;${_tradeExits.length > 1 ? 'cursor:pointer;touch-action:manipulation' : 'visibility:hidden'}" onclick="removeTradeExit(${i})">✕</div>
+    </div>`).join('');
+  updateTradeCalc();
+}
+function updateExitVal(i, key, val) {
+  _tradeExits[i][key] = key === 'lots' ? (parseInt(val) || 1) : (parseFloat(val) || '');
+  updateTradeCalc();
+}
+function addTradeExit() { _tradeExits.push({price: '', lots: 1}); renderTradeExits(); }
+function removeTradeExit(i) { _tradeExits.splice(i, 1); renderTradeExits(); }
+function updateTradeCalc() {
+  const calcEl = document.getElementById('tr-calc');
+  if (!calcEl) return;
+  const dir = getChipSel('tr-dir-chips');
+  const hasEntry = _tradeEntries.some(e => e.price);
+  const hasExit = _tradeExits.some(e => e.price);
+  if (!dir || !hasEntry || !hasExit) { calcEl.style.display = 'none'; return; }
+  const entryVal = _tradeEntries.reduce((s, e) => s + (e.price ? e.price * (e.lots || 1) : 0), 0);
+  const exitVal = _tradeExits.reduce((s, e) => s + (e.price ? e.price * (e.lots || 1) : 0), 0);
+  const total = Math.round(dir === '多' ? exitVal - entryVal : entryVal - exitVal);
+  const result = total > 0 ? '獲利' : total < 0 ? '吃損' : '保本';
+  const col = total > 0 ? '#69f0ae' : total < 0 ? '#ff5252' : '#aaa';
+  document.getElementById('tr-calc-pts').textContent = (total > 0 ? '+' : '') + total;
+  document.getElementById('tr-calc-pts').style.color = col;
+  document.getElementById('tr-calc-result').textContent = result;
+  document.getElementById('tr-calc-result').style.color = col;
+  calcEl.style.display = 'block';
+}
+function saveTrade() {
+  const isFut = document.getElementById('tr-type-fut') && document.getElementById('tr-type-fut').classList.contains('sel');
+  const date = document.getElementById('tr-date') ? document.getElementById('tr-date').value : today();
+  const sess = document.getElementById('tr-sess-0') && document.getElementById('tr-sess-0').classList.contains('sel') ? '早盤' : '午盤';
+  let trade = { id: _editTradeId || genTradeId(), date, session: sess };
+  if (isFut) {
+    const dir = getChipSel('tr-dir-chips');
+    const trend = getChipSel('tr-trend-chips');
+    const prevTrend = getChipSel('tr-prevtrend-chips');
+    const entries = _tradeEntries.filter(e => e.price).map(e => ({price: parseFloat(e.price), lots: e.lots || 1}));
+    const exits = _tradeExits.filter(e => e.price).map(e => ({price: parseFloat(e.price), lots: e.lots || 1}));
+    const entryVal = entries.reduce((s, e) => s + e.price * e.lots, 0);
+    const exitVal = exits.reduce((s, e) => s + e.price * e.lots, 0);
+    const totalPts = Math.round(dir === '多' ? exitVal - entryVal : entryVal - exitVal);
+    const result = entries.length && exits.length ? (totalPts > 0 ? '獲利' : totalPts < 0 ? '吃損' : '保本') : null;
+    trade = Object.assign(trade, {type: 'futures', dir, trend, prevTrend, entries, exits, totalPts, result});
+  } else {
+    const optDir = getChipSel('tr-optdir-chips');
+    const strike = parseFloat(document.getElementById('tr-strike') ? document.getElementById('tr-strike').value : '') || null;
+    const premium = parseFloat(document.getElementById('tr-premium') ? document.getElementById('tr-premium').value : '') || null;
+    const optResult = getChipSel('tr-optresult-chips');
+    trade = Object.assign(trade, {type: 'options', optDir, strike, premium, optResult});
+  }
+  const idx = trades.findIndex(t => t.id === trade.id);
+  if (idx >= 0) trades[idx] = trade; else trades.push(trade);
+  saveTrades();
+  closeTradeModal();
+  renderTrades();
+}
+function confirmDeleteTrade(id) {
+  if (!confirm('確定要刪除這筆記錄？')) return;
+  trades = trades.filter(t => t.id !== id);
+  saveTrades();
+  closeTradeModal();
+  renderTrades();
+}
+
+// ══════════════════════════════════════════
 // TAB SWITCH
 // ══════════════════════════════════════════
 function switchTab(i) {
@@ -1930,6 +2363,7 @@ function switchTab(i) {
   if(i===1) loadSentRef();
   if(i===2) { renderPrices(); updateHistSel(); renderPlanSection(); }
   if(i===3) renderConfirm();
+  if(i===4) renderTrades();
 }
 
 // ══════════════════════════════════════════
@@ -1992,6 +2426,7 @@ function setupAutoAdvance() {
 // ══════════════════════════════════════════
 load();
 loadPlans();
+loadTrades();
 cleanGhostRecs(); // 清除空白幽靈記錄（Fix4）
 initFirebase();
 
@@ -2009,6 +2444,10 @@ const hr=new Date().getHours();
 if(hr>=14&&hr<24) { curSess='午盤'; document.getElementById('sb0').classList.remove('active'); document.getElementById('sb1').classList.add('active'); }
 prefillForm(curSess);
 </script>
+<!-- 交易紀錄 Modal -->
+<div id="trade-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500" onclick="closeTradeModal()"></div>
+<div id="trade-panel" style="display:none;position:fixed;left:0;right:0;bottom:0;background:#1a1a24;border-radius:14px 14px 0 0;padding:20px;z-index:501;max-height:88vh;overflow-y:auto"></div>
+
 <!-- 同步設定 Modal -->
 <div id="sync-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500" onclick="closeSyncSettings()"></div>
 <div id="sync-panel" style="display:none;position:fixed;left:12px;right:12px;bottom:0;background:#1a1a24;border-radius:14px 14px 0 0;padding:20px;z-index:501">

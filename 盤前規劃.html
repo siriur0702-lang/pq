@@ -2058,14 +2058,29 @@ function renderTradeList(mt) {
 function getTradeContextHTML(date, session) {
   const rec = recs.find(r => r.date === date && r.session === session);
   if (!rec) return '<div style="font-size:12px;color:#444;padding:4px 0">找不到當日盤前數據</div>';
-  const stateColor = s => s === '突破多' ? '#ff5252' : s === '維持多' ? '#ff9800' : s === '維持空' ? '#69f0ae' : s === '突破空' ? '#4fc3f7' : '#555';
-  const stateBadge = (label, s) => s ? `<span style="font-size:11px;color:${stateColor(s)};background:rgba(0,0,0,.2);border:1px solid ${stateColor(s)}44;border-radius:4px;padding:1px 5px">${s}</span>` : '<span style="color:#444;font-size:11px">—</span>';
+  // 找前一盤
+  const sorted = [...recs].sort((a,b) => b.date.localeCompare(a.date) || (b.session==='午盤'?1:-1));
+  const curIdx = sorted.findIndex(r => r.date === date && r.session === session);
+  const prevRec = curIdx >= 0 ? sorted[curIdx + 1] : null;
+  const stateScore = {'突破多':4,'維持多':3,'維持空':2,'突破空':1};
+  const stateColor = s => s==='突破多'?'#ff5252':s==='維持多'?'#ff9800':s==='維持空'?'#69f0ae':s==='突破空'?'#4fc3f7':'#555';
+  const changeArrow = (cur, prev) => {
+    if (!cur || !prev || !stateScore[cur] || !stateScore[prev]) return '';
+    const diff = stateScore[cur] - stateScore[prev];
+    if (diff > 0) return '<span style="color:#69f0ae;font-size:11px;font-weight:700">↑</span>';
+    if (diff < 0) return '<span style="color:#ff9800;font-size:11px;font-weight:700">↓</span>';
+    return '<span style="color:#444;font-size:11px">=</span>';
+  };
+  const stateBadge = (sym, cur, prev) => {
+    const badge = cur ? `<span style="font-size:11px;color:${stateColor(cur)};background:rgba(0,0,0,.2);border:1px solid ${stateColor(cur)}44;border-radius:4px;padding:1px 5px">${cur}</span>` : '<span style="color:#444;font-size:11px">—</span>';
+    return badge + changeArrow(cur, prev);
+  };
   // 三大指數 + 費半
   const idxHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-    <span style="font-size:12px;color:#999">台指</span>${stateBadge('台指', rec.f && rec.f.state)}
-    <span style="font-size:12px;color:#999;margin-left:2px">加權</span>${stateBadge('加權', rec.tai && rec.tai.state)}
-    <span style="font-size:12px;color:#999;margin-left:2px">OTC</span>${stateBadge('OTC', rec.otc && rec.otc.state)}
-    <span style="font-size:12px;color:#999;margin-left:2px">費半</span>${stateBadge('費半', rec.sox && rec.sox.state)}
+    <span style="font-size:12px;color:#999">台指</span>${stateBadge('f', rec.f&&rec.f.state, prevRec&&prevRec.f&&prevRec.f.state)}
+    <span style="font-size:12px;color:#999;margin-left:2px">加權</span>${stateBadge('tai', rec.tai&&rec.tai.state, prevRec&&prevRec.tai&&prevRec.tai.state)}
+    <span style="font-size:12px;color:#999;margin-left:2px">OTC</span>${stateBadge('otc', rec.otc&&rec.otc.state, prevRec&&prevRec.otc&&prevRec.otc.state)}
+    <span style="font-size:12px;color:#999;margin-left:2px">費半</span>${stateBadge('sox', rec.sox&&rec.sox.state, prevRec&&prevRec.sox&&prevRec.sox.state)}
   </div>`;
   // 市場情緒
   const s = rec.sent;

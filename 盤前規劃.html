@@ -2080,6 +2080,7 @@ function renderTradeItem(t) {
         <span style="font-size:13px;color:#555">${t.session}</span>
         <span class="badge ${t.dir === '多' ? 'b-突破多' : 'b-突破空'}" style="font-size:12px;padding:2px 7px">${t.dir || '—'}</span>
         <span style="font-size:12px;color:${tc}">${t.trend || ''}</span>
+        ${t.prevTrend ? `<span style="font-size:11px;color:#444;background:#1a1a24;border:1px solid #252532;border-radius:4px;padding:1px 5px">${t.prevTrend === '強趨勢' ? '強' : t.prevTrend === '穩趨勢' ? '穩' : '巴'}</span>` : ''}
       </div>
       <div style="text-align:right">
         <div style="font-size:16px;font-weight:700;color:${ptsCol}">${(t.totalPts || 0) > 0 ? '+' : ''}${t.totalPts || 0}</div>

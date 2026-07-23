@@ -2060,30 +2060,64 @@ function getTradeContextHTML(date, session) {
   if (!rec) return '<div style="font-size:12px;color:#444;padding:4px 0">找不到當日盤前數據</div>';
   const stateColor = s => s === '突破多' ? '#ff5252' : s === '維持多' ? '#ff9800' : s === '維持空' ? '#69f0ae' : s === '突破空' ? '#4fc3f7' : '#555';
   const stateBadge = (label, s) => s ? `<span style="font-size:11px;color:${stateColor(s)};background:rgba(0,0,0,.2);border:1px solid ${stateColor(s)}44;border-radius:4px;padding:1px 5px">${s}</span>` : '<span style="color:#444;font-size:11px">—</span>';
-  // 三大指數
-  const idxHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-    <span style="font-size:12px;color:#555">台指 </span>${stateBadge('台指', rec.f && rec.f.state)}
-    <span style="font-size:12px;color:#555;margin-left:4px">加權 </span>${stateBadge('加權', rec.tai && rec.tai.state)}
-    <span style="font-size:12px;color:#555;margin-left:4px">OTC </span>${stateBadge('OTC', rec.otc && rec.otc.state)}
+  // 三大指數 + 費半
+  const idxHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+    <span style="font-size:12px;color:#999">台指</span>${stateBadge('台指', rec.f && rec.f.state)}
+    <span style="font-size:12px;color:#999;margin-left:2px">加權</span>${stateBadge('加權', rec.tai && rec.tai.state)}
+    <span style="font-size:12px;color:#999;margin-left:2px">OTC</span>${stateBadge('OTC', rec.otc && rec.otc.state)}
+    <span style="font-size:12px;color:#999;margin-left:2px">費半</span>${stateBadge('費半', rec.sox && rec.sox.state)}
   </div>`;
   // 市場情緒
   const s = rec.sent;
-  if (!s) return idxHTML + '<div style="font-size:12px;color:#444">無市場情緒資料</div>';
-  const fnetStr = s.fnet != null ? (s.fnet > 0 ? '+' : '') + s.fnet + ' 口' : '—';
-  const fnetCol = s.fnet > 0 ? '#ff5252' : s.fnet < 0 ? '#4fc3f7' : '#aaa';
-  const premStr = s.premiumStatus ? s.premiumStatus + (s.premiumChange != null ? (s.premiumChange > 0 ? ' ↑擴' : s.premiumChange < 0 ? ' ↓縮' : '') : '') : '—';
-  const premCol = s.premiumStatus === '正價差' ? '#ff9800' : '#90caf9';
-  const vixStr = s.vixChg != null ? (s.vixChg > 0 ? '↑ 上升' : s.vixChg < 0 ? '↓ 下降' : '持平') : '—';
-  const vixCol = s.vixChg > 0 ? '#ff5252' : s.vixChg < 0 ? '#69f0ae' : '#aaa';
+  if (!s) return idxHTML + '<div style="font-size:12px;color:#777">無市場情緒資料</div>';
+  const bull=[], bear=[];
+  const judgeRow = (lbl, detail, judge) => {
+    const jCol = judge === '偏多' ? '#ff5252' : judge === '偏空' ? '#4fc3f7' : '#555';
+    if (judge === '偏多') bull.push(1);
+    if (judge === '偏空') bear.push(1);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #131318">
+      <span style="color:#999;font-size:12px;min-width:28px">${lbl}</span>
+      <span style="color:#777;font-size:12px;flex:1;padding:0 8px">${detail}</span>
+      <span style="color:${jCol};font-size:12px;font-weight:600;min-width:28px;text-align:right">${judge}</span>
+    </div>`;
+  };
+  // 外資
+  let rows = '';
+  if (s.fnet != null) {
+    const isB = s.fnet > 0;
+    rows += judgeRow('外資', `${s.fnet > 0 ? '+' : ''}${s.fnet.toLocaleString()} 口`, isB ? '偏多' : '偏空');
+  } else { rows += judgeRow('外資', '無資料', '—'); }
+  // 價差
+  if (s.premium != null && s.premiumChange != null) {
+    const isB = s.premium < 0;
+    const pType = s.premium > 0 ? '正價差' : '逆價差';
+    const chgWord = s.premium > 0 ? (s.premiumChange > 0 ? '擴散' : '收斂') : (s.premiumChange < 0 ? '擴散' : '收斂');
+    rows += judgeRow('價差', `${pType} ${s.premiumChange > 0 ? '+' : ''}${s.premiumChange} → ${chgWord}`, isB ? '偏多' : '偏空');
+  } else { rows += judgeRow('價差', '無資料', '—'); }
+  // VIX
+  if (s.vixChg != null) {
+    const isB = s.vixChg < 0;
+    rows += judgeRow('VIX', `${s.vixChg > 0 ? '↑ 上升' : '↓ 下降'}（${s.vixChg > 0 ? '+' : ''}${s.vixChg}）`, isB ? '偏多' : '偏空');
+  } else { rows += judgeRow('VIX', '無資料', '—'); }
+  // 量能
   const volCol = s.volJudge === '趨勢推' ? '#4fc3f7' : s.volJudge === '震盪盤' ? '#ffb74d' : '#aaa';
-  const contraStr = s.hasContradiction ? `<span style="color:#ff9800">有矛盾</span>（累積 ${s.contradictionCount || 0} 次）` : `<span style="color:#555">無矛盾</span>`;
-  const sentHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12px;margin-bottom:6px">
-    <div><span style="color:#555">外資 </span><b style="color:${fnetCol}">${fnetStr}</b></div>
-    <div><span style="color:#555">價差 </span><b style="color:${premCol}">${premStr}</b></div>
-    <div><span style="color:#555">VIX  </span><b style="color:${vixCol}">${vixStr}</b></div>
-    <div><span style="color:#555">量能 </span><b style="color:${volCol}">${s.volJudge || '—'}</b></div>
-  </div>
-  <div style="font-size:12px">${contraStr}</div>`;
+  rows += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #131318">
+    <span style="color:#999;font-size:12px;min-width:28px">量能</span>
+    <span style="color:${volCol};font-size:12px;font-weight:600;flex:1;padding:0 8px">${s.volJudge || '—'}</span>
+    <span style="font-size:12px;min-width:28px"></span>
+  </div>`;
+  // 投票結果
+  const total = bull.length + bear.length;
+  let dir = '中性', dirCol = '#aaa';
+  if (total > 0) { if (bull.length > bear.length) { dir = '偏多'; dirCol = '#ff5252'; } else if (bear.length > bull.length) { dir = '偏空'; dirCol = '#4fc3f7'; } }
+  const voteStr = total > 0 ? `${bull.length}多 ${bear.length}空 → <b style="color:${dirCol}">${dir}</b>` : '—';
+  // 矛盾
+  const contraStr = s.hasContradiction ? `<span style="color:#ff9800;font-weight:600">有矛盾</span>（累積 ${s.contradictionCount || 0} 次）` : `<span style="color:#666">無矛盾</span>`;
+  const sentHTML = `<div style="margin-bottom:6px">${rows}</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-top:4px">
+    <span>${contraStr}</span>
+    <span style="color:#777">情緒 ${voteStr}</span>
+  </div>`;
   return idxHTML + sentHTML;
 }
 

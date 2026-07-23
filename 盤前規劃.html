@@ -2087,6 +2087,7 @@ function renderTradeItem(t) {
       </div>
     </div>
     <div style="margin-top:6px;font-size:12px;color:#555">進 ${t.entries && t.entries.length ? t.entries.map(e => e.price.toLocaleString() + (e.lots > 1 ? '×' + e.lots : '')).join('、') : (t.entryPrice ? t.entryPrice.toLocaleString() : '—')} → 出 ${exitStr}</div>
+    ${t.note ? `<div style="margin-top:6px;font-size:12px;color:#666;line-height:1.6;border-top:1px solid #1e1e28;padding-top:6px">${t.note.replace(/\n/g,'<br>')}</div>` : ''}
   </div>`;
 }
 
@@ -2201,6 +2202,10 @@ function renderTradeModalContent(t, defaultType) {
           <div class="chip${t && t.optResult === '吃損' ? ' sel' : ''}" onclick="selChipGroup('tr-optresult-chips',this)">吃損</div>
         </div>
       </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="sub">備註（心理過程、市場狀況）</div>
+      <textarea id="tr-note" placeholder="例：訊號混雜所以縮碼、進場後只回檔50點…" style="width:100%;background:#0f0f13;border:1px solid #252532;border-radius:6px;padding:9px 8px;color:#e0e0e0;font-size:14px;line-height:1.7;min-height:80px;resize:vertical;touch-action:manipulation">${t && t.note ? t.note : ''}</textarea>
     </div>
     <div style="display:flex;gap:8px;padding-bottom:16px">
       <button class="btn btn-blue" style="margin:0" onclick="saveTrade()">儲存</button>
@@ -2321,7 +2326,8 @@ function saveTrade() {
   const isFut = document.getElementById('tr-type-fut') && document.getElementById('tr-type-fut').classList.contains('sel');
   const date = document.getElementById('tr-date') ? document.getElementById('tr-date').value : today();
   const sess = document.getElementById('tr-sess-0') && document.getElementById('tr-sess-0').classList.contains('sel') ? '早盤' : '午盤';
-  let trade = { id: _editTradeId || genTradeId(), date, session: sess };
+  const note = document.getElementById('tr-note') ? document.getElementById('tr-note').value.trim() : '';
+  let trade = { id: _editTradeId || genTradeId(), date, session: sess, note };
   if (isFut) {
     const dir = getChipSel('tr-dir-chips');
     const trend = getChipSel('tr-trend-chips');

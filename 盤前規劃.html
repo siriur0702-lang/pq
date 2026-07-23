@@ -2062,14 +2062,25 @@ function getTradeContextHTML(date, session) {
   const sorted = [...recs].sort((a,b) => b.date.localeCompare(a.date) || (b.session==='午盤'?1:-1));
   const curIdx = sorted.findIndex(r => r.date === date && r.session === session);
   const prevRec = curIdx >= 0 ? sorted[curIdx + 1] : null;
-  const stateScore = {'突破多':4,'維持多':3,'維持空':2,'突破空':1};
   const stateColor = s => s==='突破多'?'#ff5252':s==='維持多'?'#ff9800':s==='維持空'?'#69f0ae':s==='突破空'?'#4fc3f7':'#555';
+  const isBull = s => s==='突破多'||s==='維持多';
+  const stateScore = {'突破多':4,'維持多':3,'維持空':2,'突破空':1};
   const changeArrow = (cur, prev) => {
     if (!cur || !prev || !stateScore[cur] || !stateScore[prev]) return '';
+    const curB = isBull(cur), prevB = isBull(prev);
+    // 跨陣營反轉
+    if (curB !== prevB) return curB
+      ? `<span style="color:#ff5252;font-size:10px;font-weight:700;background:rgba(255,82,82,.1);border-radius:3px;padding:0 3px">反轉多</span>`
+      : `<span style="color:#4fc3f7;font-size:10px;font-weight:700;background:rgba(79,195,247,.1);border-radius:3px;padding:0 3px">反轉空</span>`;
     const diff = stateScore[cur] - stateScore[prev];
-    if (diff > 0) return '<span style="color:#69f0ae;font-size:11px;font-weight:700">↑</span>';
-    if (diff < 0) return '<span style="color:#ff9800;font-size:11px;font-weight:700">↓</span>';
-    return '<span style="color:#444;font-size:11px">=</span>';
+    if (diff === 0) return '<span style="color:#444;font-size:11px"> —</span>';
+    if (curB) return diff > 0
+      ? '<span style="color:#ff5252;font-size:12px;font-weight:700"> ↑</span>'
+      : '<span style="color:#ff5252;font-size:12px;font-weight:700"> ↓</span>';
+    // 空方
+    return diff < 0
+      ? '<span style="color:#4fc3f7;font-size:12px;font-weight:700"> ↑</span>'
+      : '<span style="color:#69f0ae;font-size:12px;font-weight:700"> ↓</span>';
   };
   const stateBadge = (sym, cur, prev) => {
     const badge = cur ? `<span style="font-size:11px;color:${stateColor(cur)};background:rgba(0,0,0,.2);border:1px solid ${stateColor(cur)}44;border-radius:4px;padding:1px 5px">${cur}</span>` : '<span style="color:#444;font-size:11px">—</span>';

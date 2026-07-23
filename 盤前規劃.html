@@ -2055,40 +2055,89 @@ function renderTradeList(mt) {
     </div>`).join('');
 }
 
+function getTradeContextHTML(date, session) {
+  const rec = recs.find(r => r.date === date && r.session === session);
+  if (!rec) return '<div style="font-size:12px;color:#444;padding:4px 0">找不到當日盤前數據</div>';
+  const stateColor = s => s === '突破多' ? '#ff5252' : s === '維持多' ? '#ff9800' : s === '維持空' ? '#69f0ae' : s === '突破空' ? '#4fc3f7' : '#555';
+  const stateBadge = (label, s) => s ? `<span style="font-size:11px;color:${stateColor(s)};background:rgba(0,0,0,.2);border:1px solid ${stateColor(s)}44;border-radius:4px;padding:1px 5px">${s}</span>` : '<span style="color:#444;font-size:11px">—</span>';
+  // 三大指數
+  const idxHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+    <span style="font-size:12px;color:#555">台指 </span>${stateBadge('台指', rec.f && rec.f.state)}
+    <span style="font-size:12px;color:#555;margin-left:4px">加權 </span>${stateBadge('加權', rec.tai && rec.tai.state)}
+    <span style="font-size:12px;color:#555;margin-left:4px">OTC </span>${stateBadge('OTC', rec.otc && rec.otc.state)}
+  </div>`;
+  // 市場情緒
+  const s = rec.sent;
+  if (!s) return idxHTML + '<div style="font-size:12px;color:#444">無市場情緒資料</div>';
+  const fnetStr = s.fnet != null ? (s.fnet > 0 ? '+' : '') + s.fnet + ' 口' : '—';
+  const fnetCol = s.fnet > 0 ? '#ff5252' : s.fnet < 0 ? '#4fc3f7' : '#aaa';
+  const premStr = s.premiumStatus ? s.premiumStatus + (s.premiumChange != null ? (s.premiumChange > 0 ? ' ↑擴' : s.premiumChange < 0 ? ' ↓縮' : '') : '') : '—';
+  const premCol = s.premiumStatus === '正價差' ? '#ff9800' : '#90caf9';
+  const vixStr = s.vixChg != null ? (s.vixChg > 0 ? '↑ 上升' : s.vixChg < 0 ? '↓ 下降' : '持平') : '—';
+  const vixCol = s.vixChg > 0 ? '#ff5252' : s.vixChg < 0 ? '#69f0ae' : '#aaa';
+  const volCol = s.volJudge === '趨勢推' ? '#4fc3f7' : s.volJudge === '震盪盤' ? '#ffb74d' : '#aaa';
+  const contraStr = s.hasContradiction ? `<span style="color:#ff9800">有矛盾</span>（累積 ${s.contradictionCount || 0} 次）` : `<span style="color:#555">無矛盾</span>`;
+  const sentHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:12px;margin-bottom:6px">
+    <div><span style="color:#555">外資 </span><b style="color:${fnetCol}">${fnetStr}</b></div>
+    <div><span style="color:#555">價差 </span><b style="color:${premCol}">${premStr}</b></div>
+    <div><span style="color:#555">VIX  </span><b style="color:${vixCol}">${vixStr}</b></div>
+    <div><span style="color:#555">量能 </span><b style="color:${volCol}">${s.volJudge || '—'}</b></div>
+  </div>
+  <div style="font-size:12px">${contraStr}</div>`;
+  return idxHTML + sentHTML;
+}
+
+function toggleTradeDetail(id) {
+  const det = document.getElementById('tdet-' + id);
+  if (!det) return;
+  const isOpen = det.classList.contains('open');
+  det.classList.toggle('open', !isOpen);
+  det.style.display = isOpen ? 'none' : 'block';
+}
+
 function renderTradeItem(t) {
   if (t.type === 'options') {
     const rc = t.optResult === '全賺' ? '#69f0ae' : t.optResult === '吃損' ? '#ff5252' : '#aaa';
-    return `<div class="hist-item" onclick="openTradeModal('${t.id}')">
-      <div style="display:flex;justify-content:space-between;align-items:center">
+    return `<div class="hist-item">
+      <div style="display:flex;justify-content:space-between;align-items:center" onclick="toggleTradeDetail('${t.id}')">
         <div style="display:flex;gap:8px;align-items:center">
           <span style="font-size:13px;color:#555">${t.session}</span>
           <span style="font-size:14px;font-weight:700;color:#90caf9">${t.optDir || '—'}</span>
           <span style="font-size:13px;color:#aaa">${t.strike ? t.strike.toLocaleString() : '—'}</span>
         </div>
-        <span style="font-size:14px;font-weight:600;color:${rc}">${t.optResult || '—'}</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:14px;font-weight:600;color:${rc}">${t.optResult || '—'}</span>
+          <span style="font-size:13px;color:#4fc3f7;touch-action:manipulation" onclick="event.stopPropagation();openTradeModal('${t.id}')">編輯</span>
+        </div>
       </div>
       ${t.premium ? `<div style="margin-top:4px;font-size:12px;color:#555">權利金 ${t.premium}</div>` : ''}
+      <div id="tdet-${t.id}" class="hist-det" style="display:none">${getTradeContextHTML(t.date, t.session)}</div>
     </div>`;
   }
   const ptsCol = (t.totalPts || 0) > 0 ? '#69f0ae' : (t.totalPts || 0) < 0 ? '#ff5252' : '#aaa';
   const rc = t.result === '獲利' ? '#69f0ae' : t.result === '吃損' ? '#ff5252' : '#aaa';
   const tc = t.trend === '順勢' ? '#4fc3f7' : '#ffb74d';
   const exitStr = t.exits && t.exits.length ? t.exits.map(e => (e.price ? e.price.toLocaleString() : '?') + (e.lots > 1 ? `×${e.lots}` : '')).join('、') : '—';
-  return `<div class="hist-item" onclick="openTradeModal('${t.id}')">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="display:flex;gap:8px;align-items:center">
+  const entryStr = t.entries && t.entries.length ? t.entries.map(e => e.price.toLocaleString() + (e.lots > 1 ? '×' + e.lots : '')).join('、') : (t.entryPrice ? t.entryPrice.toLocaleString() : '—');
+  return `<div class="hist-item">
+    <div style="display:flex;justify-content:space-between;align-items:center" onclick="toggleTradeDetail('${t.id}')">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span style="font-size:13px;color:#555">${t.session}</span>
         <span class="badge ${t.dir === '多' ? 'b-突破多' : 'b-突破空'}" style="font-size:12px;padding:2px 7px">${t.dir || '—'}</span>
         <span style="font-size:12px;color:${tc}">${t.trend || ''}</span>
         ${t.prevTrend ? `<span style="font-size:11px;color:#444;background:#1a1a24;border:1px solid #252532;border-radius:4px;padding:1px 5px">${t.prevTrend === '強趨勢' ? '強' : t.prevTrend === '穩趨勢' ? '穩' : '巴'}</span>` : ''}
       </div>
-      <div style="text-align:right">
-        <div style="font-size:16px;font-weight:700;color:${ptsCol}">${(t.totalPts || 0) > 0 ? '+' : ''}${t.totalPts || 0}</div>
-        <div style="font-size:11px;color:${rc}">${t.result || '—'}</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="text-align:right">
+          <div style="font-size:16px;font-weight:700;color:${ptsCol}">${(t.totalPts || 0) > 0 ? '+' : ''}${t.totalPts || 0}</div>
+          <div style="font-size:11px;color:${rc}">${t.result || '—'}</div>
+        </div>
+        <span style="font-size:13px;color:#4fc3f7;touch-action:manipulation;white-space:nowrap" onclick="event.stopPropagation();openTradeModal('${t.id}')">編輯</span>
       </div>
     </div>
-    <div style="margin-top:6px;font-size:12px;color:#555">進 ${t.entries && t.entries.length ? t.entries.map(e => e.price.toLocaleString() + (e.lots > 1 ? '×' + e.lots : '')).join('、') : (t.entryPrice ? t.entryPrice.toLocaleString() : '—')} → 出 ${exitStr}</div>
+    <div style="margin-top:6px;font-size:12px;color:#555">進 ${entryStr} → 出 ${exitStr}</div>
     ${t.note ? `<div style="margin-top:6px;font-size:12px;color:#666;line-height:1.6;border-top:1px solid #1e1e28;padding-top:6px">${t.note.replace(/\n/g,'<br>')}</div>` : ''}
+    <div id="tdet-${t.id}" class="hist-det" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid #1e1e28">${getTradeContextHTML(t.date, t.session)}</div>
   </div>`;
 }
 
